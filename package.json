@@ -1,0 +1,16 @@
+{
+  "name": "field-weather-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "db:migrate": "pnpm --filter @field-weather/database run migrate"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
