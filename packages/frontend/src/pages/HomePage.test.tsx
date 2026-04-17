@@ -4,12 +4,14 @@ import { vi } from 'vitest';
 import { HomePage } from './HomePage';
 import { useUserStore } from '../store/userStore';
 import { userApi } from '../api/userApi';
+import { fieldApi } from '../api/fieldApi';
 
 
 describe('HomePage', () => {
   beforeEach(() => {
     useUserStore.setState(useUserStore.getInitialState());
     vi.clearAllMocks();
+    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([]);
   });
 
   it('should display "No user found" when user is null', () => {
@@ -75,5 +77,91 @@ describe('HomePage', () => {
     user.click(retryButton);
 
     expect(await screen.findByText(/welcome, test user/i)).toBeInTheDocument();
+  });
+
+  it('creates a field from the modal form', async () => {
+    vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
+      id: '1',
+      name: 'Test User',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
+
+    vi.spyOn(fieldApi, 'createField').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Beta',
+        latitude: 45,
+        longitude: 6,
+        address: 'Annecy',
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    render(<HomePage />);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /add field/i }));
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Beta');
+    await user.type(screen.getByRole('textbox', { name: /address/i }), 'Annecy');
+    await user.click(screen.getByRole('button', { name: /create field/i }));
+
+    expect(await screen.findByText('Beta')).toBeVisible();
+  });
+
+  it('edits then deletes a field from the list', async () => {
+    vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
+      id: '1',
+      name: 'Test User',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
+
+    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    vi.spyOn(fieldApi, 'updateField').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Zulu',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    vi.spyOn(fieldApi, 'deleteField').mockResolvedValue([]);
+
+    render(<HomePage />);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /edit/i }));
+    const nameInput = screen.getByRole('textbox', { name: /name/i });
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Zulu');
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+
+    expect(await screen.findByText('Zulu')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(await screen.findByText(/no fields yet/i)).toBeVisible();
   });
 });

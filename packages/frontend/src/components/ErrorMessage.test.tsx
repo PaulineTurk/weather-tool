@@ -13,7 +13,7 @@ describe('ErrorMessage', () => {
     const onRetry = () => { };
     render(<ErrorMessage message="Error" onRetry={onRetry} />);
 
-    const retryButton = screen.getByRole('button', { name: "/retry/i" });
+    const retryButton = screen.getByRole('button', { name: /retry/i });
     expect(retryButton).toBeVisible();
   });
 

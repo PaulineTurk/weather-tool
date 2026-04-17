@@ -1,0 +1,118 @@
+import { Request, Response } from 'express';
+import { FieldPayload, fieldRepository } from '../repositories/fieldRepository';
+
+const isValidOptionalNumber = (value: unknown): value is number | null | undefined => {
+  return value === null || value === undefined || (typeof value === 'number' && Number.isFinite(value));
+};
+
+const getProperty = (source: object, key: string): unknown => {
+  return Reflect.get(source, key);
+};
+
+const normalizeFieldPayload = (body: unknown): FieldPayload | null => {
+  if (typeof body !== 'object' || body === null) {
+    return null;
+  }
+
+  const rawName = getProperty(body, 'name');
+  const rawAddress = getProperty(body, 'address');
+  const rawLatitude = getProperty(body, 'latitude');
+  const rawLongitude = getProperty(body, 'longitude');
+
+  if (typeof rawName !== 'string') {
+    return null;
+  }
+
+  const name = rawName.trim();
+  if (name.length === 0) {
+    return null;
+  }
+
+  if (typeof rawAddress !== 'undefined' && rawAddress !== null && typeof rawAddress !== 'string') {
+    return null;
+  }
+
+  if (!isValidOptionalNumber(rawLatitude) || !isValidOptionalNumber(rawLongitude)) {
+    return null;
+  }
+
+  return {
+    name,
+    address: typeof rawAddress === 'string' && rawAddress.trim().length > 0 ? rawAddress.trim() : null,
+    latitude: typeof rawLatitude === 'number' ? rawLatitude : null,
+    longitude: typeof rawLongitude === 'number' ? rawLongitude : null,
+  };
+};
+
+export const fieldController = {
+  async getFieldsForUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const fields = await fieldRepository.getFieldsForUser(userId);
+      res.json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async createFieldForUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const payload = normalizeFieldPayload(req.body);
+
+      if (!payload) {
+        res.status(400).json({ error: 'Invalid field payload' });
+        return;
+      }
+
+      await fieldRepository.createFieldForUser(userId, payload);
+      const fields = await fieldRepository.getFieldsForUser(userId);
+      res.status(201).json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async updateFieldForUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const fieldId = req.params.fieldId;
+      const payload = normalizeFieldPayload(req.body);
+
+      if (!payload) {
+        res.status(400).json({ error: 'Invalid field payload' });
+        return;
+      }
+
+      const updated = await fieldRepository.updateFieldForUser(userId, fieldId, payload);
+
+      if (!updated) {
+        res.status(404).json({ error: 'Field not found' });
+        return;
+      }
+
+      const fields = await fieldRepository.getFieldsForUser(userId);
+      res.json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async deleteFieldForUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const fieldId = req.params.fieldId;
+      const deleted = await fieldRepository.deleteFieldForUser(userId, fieldId);
+
+      if (!deleted) {
+        res.status(404).json({ error: 'Field not found' });
+        return;
+      }
+
+      const fields = await fieldRepository.getFieldsForUser(userId);
+      res.json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+};
