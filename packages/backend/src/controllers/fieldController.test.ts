@@ -4,6 +4,7 @@ import { fieldController } from './fieldController';
 import { fieldRepository } from '../repositories/fieldRepository';
 import { Field } from '../repositories/fieldRepository';
 import { weatherService } from '../services/weatherService';
+import { userRepository } from '../repositories/userRepository';
 
 jest.mock('../repositories/fieldRepository', () => ({
   fieldRepository: {
@@ -22,8 +23,15 @@ jest.mock('../services/weatherService', () => ({
   },
 }));
 
+jest.mock('../repositories/userRepository', () => ({
+  userRepository: {
+    getUserById: jest.fn(),
+  },
+}));
+
 const mockFieldRepository = jest.mocked(fieldRepository);
 const mockWeatherService = jest.mocked(weatherService);
+const mockUserRepository = jest.mocked(userRepository);
 
 const createApp = () => {
   const app = express();
@@ -39,6 +47,14 @@ const createApp = () => {
 describe('fieldController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUserRepository.getUserById.mockResolvedValue({
+      id: 'user-1',
+      name: 'Default User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
+    });
     mockWeatherService.getWeatherForField.mockResolvedValue({
       status: 'not_found',
       message: 'Weather forecast not found for this location.',

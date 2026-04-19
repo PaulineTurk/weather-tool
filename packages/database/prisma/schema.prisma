@@ -8,11 +8,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  fields    Field[]
+  id              String   @id @default(cuid())
+  name            String
+  temperatureUnit String   @default("C")
+  forecastDays    Int      @default(1)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  fields          Field[]
 }
 
 model Field {

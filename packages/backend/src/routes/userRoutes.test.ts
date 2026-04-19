@@ -10,6 +10,10 @@ jest.mock('../controllers/userController', () => ({
       res.json({ id: 'default-user', name: 'Default User' });
       return Promise.resolve();
     }),
+    updateUserPreferences: jest.fn((req, res) => {
+      res.json({ id: 'default-user', temperatureUnit: 'F', forecastDays: 7 });
+      return Promise.resolve();
+    }),
   },
 }));
 
@@ -66,6 +70,17 @@ describe('userRoutes', () => {
         .expect(500);
 
       expect(response.body).toEqual({ error: 'Internal server error' });
+    });
+  });
+
+  describe('PATCH /api/users/:userId/preferences', () => {
+    it('should call the updateUserPreferences controller', async () => {
+      await request(app)
+        .patch('/api/users/default-user/preferences')
+        .send({ temperatureUnit: 'F', forecastDays: 7 })
+        .expect(200);
+
+      expect(mockUserController.updateUserPreferences).toHaveBeenCalled();
     });
   });
 });

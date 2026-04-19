@@ -10,6 +10,8 @@ describe('userApi', () => {
       const mockUser: User = {
         id: 'default-user',
         name: 'Default User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-01-01T00:00:00.000Z',
       };
@@ -45,6 +47,29 @@ describe('userApi', () => {
       );
 
       await expect(userApi.getDefaultUser()).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('updateUserPreferences', () => {
+    it('updates preferences for a user', async () => {
+      const updatedUser: User = {
+        id: 'default-user',
+        name: 'Default User',
+        temperatureUnit: 'F',
+        forecastDays: 7,
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-02T00:00:00.000Z',
+      };
+
+      vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify(updatedUser)));
+
+      const result = await userApi.updateUserPreferences('default-user', { temperatureUnit: 'F', forecastDays: 7 });
+
+      expect(result).toEqual(updatedUser);
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/users/default-user/preferences',
+        expect.objectContaining({ method: 'PATCH' })
+      );
     });
   });
 });

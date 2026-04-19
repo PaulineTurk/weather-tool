@@ -52,13 +52,15 @@ describe('HomePage', () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     });
 
     render(<HomePage />);
 
-    expect(await screen.findByText(/welcome, test user/i)).toBeVisible();
+    expect(await screen.findByText(/your fields/i)).toBeVisible();
   });
 
   it('should show greeting after retry succeeds', async () => {
@@ -67,6 +69,8 @@ describe('HomePage', () => {
       .mockResolvedValueOnce({
         id: '1',
         name: 'Test User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
         createdAt: '2024-01-01',
         updatedAt: '2024-01-01',
       });
@@ -77,13 +81,15 @@ describe('HomePage', () => {
     const user = userEvent.setup()
     user.click(retryButton);
 
-    expect(await screen.findByText(/welcome, test user/i)).toBeInTheDocument();
+    expect(await screen.findByText(/your fields/i)).toBeInTheDocument();
   });
 
   it('creates a field from the modal form', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     });
@@ -117,6 +123,8 @@ describe('HomePage', () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     });
@@ -170,6 +178,8 @@ describe('HomePage', () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     });
@@ -239,6 +249,8 @@ describe('HomePage', () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01',
     });

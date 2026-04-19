@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react';
 import { useUserStore } from './userStore';
-import { userApi } from '../api/userApi';
+import { User, userApi } from '../api/userApi';
 
 vi.mock('../api/userApi', () => ({
   userApi: {
@@ -59,9 +59,11 @@ describe('userStore', () => {
     });
 
     it('should set user state on successful fetch', async () => {
-      const mockUser = {
+      const mockUser: User = {
         id: 'default-user',
         name: 'Default User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-01-01T00:00:00.000Z',
       };
@@ -79,9 +81,11 @@ describe('userStore', () => {
     });
 
     it('should load cached default field on successful fetch', async () => {
-      const mockUser = {
+      const mockUser: User = {
         id: 'default-user',
         name: 'Default User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-01-01T00:00:00.000Z',
       };

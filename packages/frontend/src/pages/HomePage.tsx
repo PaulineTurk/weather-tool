@@ -28,6 +28,18 @@ const confidenceLabel = (level: 'high' | 'medium' | 'low' | 'unknown'): string =
 
   return 'Unknown';
 };
+
+const displayTemperature = (temperatureC: number | null, unit: 'C' | 'F'): string => {
+  if (temperatureC === null) {
+    return '-';
+  }
+
+  if (unit === 'F') {
+    return `${Math.round((temperatureC * 9) / 5 + 32)} °F`;
+  }
+
+  return `${temperatureC} °C`;
+};
 const extractDefaultField = (currentFields: Field[]): Field | null => {
   return currentFields.find((field) => field.isDefault) ?? null;
 };
@@ -201,11 +213,6 @@ export function HomePage() {
 
   return (
     <main className="mx-auto max-w-3xl space-y-4">
-      <section className="bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold text-gray-800">Welcome, {user.name}!</h1>
-        <p className="text-gray-600 mt-2">Manage your weather fields from this dashboard.</p>
-      </section>
-
       <section className="bg-white rounded-lg shadow-md p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl font-semibold text-gray-800">Your fields ({fields.length})</h2>
@@ -275,7 +282,7 @@ export function HomePage() {
                           >
                             <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
                             <p className="text-xs text-gray-600">
-                              Temp: {dayWeather.temperatureC !== null ? `${dayWeather.temperatureC} °C` : '-'}
+                              Temp: {displayTemperature(dayWeather.temperatureC, user.temperatureUnit)}
                             </p>
                             <p className="text-xs text-gray-600">
                               Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
@@ -358,7 +365,7 @@ export function HomePage() {
                               >
                                 <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
                                 <p className="text-xs text-gray-600">
-                                  Temp: {dayWeather.temperatureC !== null ? `${dayWeather.temperatureC} °C` : '-'}
+                                  Temp: {displayTemperature(dayWeather.temperatureC, user.temperatureUnit)}
                                 </p>
                                 <p className="text-xs text-gray-600">
                                   Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}

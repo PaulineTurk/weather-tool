@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { FieldPayload, fieldRepository } from '../repositories/fieldRepository';
 import { weatherService } from '../services/weatherService';
+import { userRepository } from '../repositories/userRepository';
 
 const isValidOptionalNumber = (value: unknown): value is number | null | undefined => {
   return value === null || value === undefined || (typeof value === 'number' && Number.isFinite(value));
@@ -77,12 +78,20 @@ const normalizeDefaultPayload = (body: unknown): boolean | null => {
 
 export const fieldController = {
   async enrichFieldsWithWeather(userId: string) {
+    const user = await userRepository.getUserById(userId);
+    const forecastDays = user ? user.forecastDays : 1;
     const fields = await fieldRepository.getFieldsForUser(userId);
     const enriched = await Promise.all(
-      fields.map(async (field) => ({
-        ...field,
-        weather: await weatherService.getWeatherForField(field),
-      }))
+      fields.map(async (field) => {
+        const weather = await weatherService.getWeatherForField(field);
+        return {
+          ...field,
+          weather: {
+            ...weather,
+            days: weather.days.slice(0, forecastDays),
+          },
+        };
+      })
     );
 
     return enriched;

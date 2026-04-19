@@ -39,6 +39,7 @@ type UserState = {
   isLoading: boolean;
   error: string | null;
   fetchUser: () => Promise<void>;
+  setUser: (user: User) => void;
   getCachedDefaultField: (userId: string) => Field | null;
   cacheDefaultField: (userId: string, field: Field | null) => void;
 };
@@ -62,6 +63,10 @@ export const useUserStore = create<UserState>((set, get) => ({
         isLoading: false
       });
     }
+  },
+
+  setUser: (user: User) => {
+    set({ user });
   },
 
   getCachedDefaultField: (userId: string) => {

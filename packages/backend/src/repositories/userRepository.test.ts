@@ -3,7 +3,9 @@ import prisma from '../db';
 
 jest.mock('../db', () => ({
   user: {
+    findUnique: jest.fn(),
     findFirst: jest.fn(),
+    update: jest.fn(),
   },
 }));
 
@@ -18,6 +20,8 @@ describe('userRepository', () => {
     const expectedUser: User = {
       id: 'default-user',
       name: 'Default User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
     };
@@ -41,6 +45,38 @@ describe('userRepository', () => {
       expect(result).toBeNull();
       expect(mockPrisma.user.findFirst).toHaveBeenCalledWith({
         where: { id: 'default-user' },
+      });
+    });
+  });
+
+  describe('updateUserPreferences', () => {
+    it('updates existing user preferences', async () => {
+      const existingUser: User = {
+        id: 'default-user',
+        name: 'Default User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      };
+      const updatedUser: User = {
+        ...existingUser,
+        temperatureUnit: 'F',
+        forecastDays: 5,
+      };
+
+      mockPrisma.user.findUnique.mockResolvedValue(existingUser);
+      mockPrisma.user.update.mockResolvedValue(updatedUser);
+
+      const result = await userRepository.updateUserPreferences('default-user', {
+        temperatureUnit: 'F',
+        forecastDays: 5,
+      });
+
+      expect(result).toEqual(updatedUser);
+      expect(mockPrisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'default-user' },
+        data: { temperatureUnit: 'F', forecastDays: 5 },
       });
     });
   });

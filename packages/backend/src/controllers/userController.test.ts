@@ -1,10 +1,12 @@
 import { userController } from './userController';
 import { userRepository } from '../repositories/userRepository';
 import { Request, Response } from 'express';
+import { User } from '../repositories/userRepository';
 
 jest.mock('../repositories/userRepository', () => ({
   userRepository: {
     getDefaultUser: jest.fn(),
+    updateUserPreferences: jest.fn(),
   },
 }));
 
@@ -25,9 +27,11 @@ describe('userController', () => {
 
   describe('getDefaultUser', () => {
     it('should return the default user when found', async () => {
-      const mockUser = {
+      const mockUser: User = {
         id: 'default-user',
         name: 'Default User',
+        temperatureUnit: 'C',
+        forecastDays: 1,
         createdAt: new Date('2024-01-01'),
         updatedAt: new Date('2024-01-01'),
       };
@@ -73,6 +77,28 @@ describe('userController', () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         error: 'Internal server error',
       });
+    });
+  });
+
+  describe('updateUserPreferences', () => {
+    it('updates user preferences successfully', async () => {
+      mockRequest = {
+        params: { userId: 'default-user' },
+        body: { temperatureUnit: 'F', forecastDays: 7 },
+      };
+      const updatedUser: User = {
+        id: 'default-user',
+        name: 'Default User',
+        temperatureUnit: 'F',
+        forecastDays: 7,
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-02'),
+      };
+      mockUserRepository.updateUserPreferences.mockResolvedValue(updatedUser);
+
+      await userController.updateUserPreferences(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.json).toHaveBeenCalledWith(updatedUser);
     });
   });
 });
