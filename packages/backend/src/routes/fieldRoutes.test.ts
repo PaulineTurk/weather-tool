@@ -5,6 +5,10 @@ import { fieldController } from '../controllers/fieldController';
 
 jest.mock('../controllers/fieldController', () => ({
   fieldController: {
+    getWeatherByCoordinates: jest.fn((req, res) => {
+      res.json({ status: 'ok', days: [] });
+      return Promise.resolve();
+    }),
     getFieldsForUser: jest.fn((req, res) => {
       res.json([{ id: 'f1', name: 'Alpha' }]);
       return Promise.resolve();
@@ -39,6 +43,11 @@ describe('fieldRoutes', () => {
   it('routes GET /users/:userId to getFieldsForUser', async () => {
     await request(app).get('/api/fields/users/user-1').expect(200);
     expect(mockFieldController.getFieldsForUser).toHaveBeenCalled();
+  });
+
+  it('routes GET /weather to getWeatherByCoordinates', async () => {
+    await request(app).get('/api/fields/weather?latitude=48.1222&longitude=2.0344').expect(200);
+    expect(mockFieldController.getWeatherByCoordinates).toHaveBeenCalled();
   });
 
   it('routes POST /users/:userId to createFieldForUser', async () => {

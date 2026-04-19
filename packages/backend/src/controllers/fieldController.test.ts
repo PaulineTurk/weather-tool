@@ -3,6 +3,7 @@ import request from 'supertest';
 import { fieldController } from './fieldController';
 import { fieldRepository } from '../repositories/fieldRepository';
 import { Field } from '../repositories/fieldRepository';
+import { weatherService } from '../services/weatherService';
 
 jest.mock('../repositories/fieldRepository', () => ({
   fieldRepository: {
@@ -13,7 +14,14 @@ jest.mock('../repositories/fieldRepository', () => ({
   },
 }));
 
+jest.mock('../services/weatherService', () => ({
+  weatherService: {
+    getWeatherForField: jest.fn(),
+  },
+}));
+
 const mockFieldRepository = jest.mocked(fieldRepository);
+const mockWeatherService = jest.mocked(weatherService);
 
 const createApp = () => {
   const app = express();
@@ -28,6 +36,12 @@ const createApp = () => {
 describe('fieldController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockWeatherService.getWeatherForField.mockResolvedValue({
+      status: 'not_found',
+      message: 'Weather forecast not found for this location.',
+      location: null,
+      days: [],
+    });
   });
 
   it('returns fields for the requested user', async () => {

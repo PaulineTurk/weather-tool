@@ -1,3 +1,21 @@
+export type WeatherDay = {
+  date: string;
+  temperatureC: number | null;
+  precipitationMm: number | null;
+  windSpeedMs: number | null;
+  confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
+}
+
+export type FieldWeather = {
+  status: 'ok' | 'not_found' | 'unavailable';
+  message: string | null;
+  location: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  days: WeatherDay[];
+}
+
 export type Field = {
   id: string;
   name: string;
@@ -8,6 +26,7 @@ export type Field = {
   userId: string;
   createdAt: string;
   updatedAt: string;
+  weather?: FieldWeather;
 }
 
 export type FieldPayload = {

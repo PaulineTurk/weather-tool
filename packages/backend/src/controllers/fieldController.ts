@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { FieldPayload, fieldRepository } from '../repositories/fieldRepository';
+import { weatherService } from '../services/weatherService';
 
 const isValidOptionalNumber = (value: unknown): value is number | null | undefined => {
   return value === null || value === undefined || (typeof value === 'number' && Number.isFinite(value));
@@ -7,6 +8,19 @@ const isValidOptionalNumber = (value: unknown): value is number | null | undefin
 
 const getProperty = (source: object, key: string): unknown => {
   return Reflect.get(source, key);
+};
+
+const parseCoordinateQuery = (value: unknown): number | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const parsed = Number.parseFloat(value);
+  if (!Number.isFinite(parsed)) {
+    return null;
+  }
+
+  return parsed;
 };
 
 const normalizeFieldPayload = (body: unknown): FieldPayload | null => {
@@ -45,11 +59,40 @@ const normalizeFieldPayload = (body: unknown): FieldPayload | null => {
 };
 
 export const fieldController = {
+  async enrichFieldsWithWeather(userId: string) {
+    const fields = await fieldRepository.getFieldsForUser(userId);
+    const enriched = await Promise.all(
+      fields.map(async (field) => ({
+        ...field,
+        weather: await weatherService.getWeatherForField(field),
+      }))
+    );
+
+    return enriched;
+  },
+
   async getFieldsForUser(req: Request, res: Response): Promise<void> {
     try {
       const userId = req.params.userId;
-      const fields = await fieldRepository.getFieldsForUser(userId);
+      const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async getWeatherByCoordinates(req: Request, res: Response): Promise<void> {
+    try {
+      const latitude = parseCoordinateQuery(req.query.latitude);
+      const longitude = parseCoordinateQuery(req.query.longitude);
+
+      if (latitude === null || longitude === null) {
+        res.status(400).json({ error: 'latitude and longitude query params are required numbers' });
+        return;
+      }
+
+      const weather = await weatherService.getWeatherForCoordinates({ latitude, longitude });
+      res.json(weather);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -66,7 +109,7 @@ export const fieldController = {
       }
 
       await fieldRepository.createFieldForUser(userId, payload);
-      const fields = await fieldRepository.getFieldsForUser(userId);
+      const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.status(201).json(fields);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
@@ -91,7 +134,7 @@ export const fieldController = {
         return;
       }
 
-      const fields = await fieldRepository.getFieldsForUser(userId);
+      const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
@@ -109,7 +152,7 @@ export const fieldController = {
         return;
       }
 
-      const fields = await fieldRepository.getFieldsForUser(userId);
+      const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });

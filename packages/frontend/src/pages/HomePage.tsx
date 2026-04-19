@@ -13,6 +13,22 @@ const parseOptionalNumber = (value: FormDataEntryValue | null): number | null =>
   return Number.isNaN(parsed) ? null : parsed;
 };
 
+const confidenceLabel = (level: 'high' | 'medium' | 'low' | 'unknown'): string => {
+  if (level === 'high') {
+    return 'High';
+  }
+
+  if (level === 'medium') {
+    return 'Medium';
+  }
+
+  if (level === 'low') {
+    return 'Low';
+  }
+
+  return 'Unknown';
+};
+
 export function HomePage() {
   const { user, isLoading, error, fetchUser } = useUserStore();
   const [fields, setFields] = useState<Field[]>([]);
@@ -206,6 +222,39 @@ export function HomePage() {
                         </button>
                       </div>
                     </div>
+
+                    <div className="mt-3 border-t border-gray-100 pt-3">
+                      {field.weather?.status === 'ok' && field.weather.days.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <div className="flex min-w-max gap-2">
+                            {field.weather.days.map((dayWeather) => (
+                              <article
+                                key={dayWeather.date}
+                                className="w-44 shrink-0 rounded-md border border-gray-200 bg-gray-50 p-2"
+                              >
+                                <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
+                                <p className="text-xs text-gray-600">
+                                  Temp: {dayWeather.temperatureC !== null ? `${dayWeather.temperatureC} °C` : '-'}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  Wind: {dayWeather.windSpeedMs !== null ? `${dayWeather.windSpeedMs} m/s` : '-'}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  Confidence: {confidenceLabel(dayWeather.confidenceLevel)}
+                                </p>
+                              </article>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">
+                          {field.weather?.message ?? 'Weather forecast unavailable for this field.'}
+                        </p>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -251,6 +300,10 @@ export function HomePage() {
                 <input
                   name="latitude"
                   type="number"
+                  step="any"
+                  min={-90}
+                  max={90}
+                  inputMode="decimal"
                   defaultValue={editingField?.latitude !== null && editingField?.latitude !== undefined ? String(editingField.latitude) : ''}
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                 />
@@ -261,6 +314,10 @@ export function HomePage() {
                 <input
                   name="longitude"
                   type="number"
+                  step="any"
+                  min={-180}
+                  max={180}
+                  inputMode="decimal"
                   defaultValue={editingField?.longitude !== null && editingField?.longitude !== undefined ? String(editingField.longitude) : ''}
                   className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
                 />
