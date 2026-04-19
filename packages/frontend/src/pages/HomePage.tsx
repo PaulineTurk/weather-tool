@@ -28,9 +28,12 @@ const confidenceLabel = (level: 'high' | 'medium' | 'low' | 'unknown'): string =
 
   return 'Unknown';
 };
+const extractDefaultField = (currentFields: Field[]): Field | null => {
+  return currentFields.find((field) => field.isDefault) ?? null;
+};
 
 export function HomePage() {
-  const { user, isLoading, error, fetchUser } = useUserStore();
+  const { user, isLoading, error, fetchUser, cacheDefaultField, getCachedDefaultField } = useUserStore();
   const [fields, setFields] = useState<Field[]>([]);
   const [fieldLoadError, setFieldLoadError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -50,22 +53,31 @@ export function HomePage() {
 
       try {
         setFieldLoadError(null);
+        const cachedDefaultField = getCachedDefaultField(user.id);
+        if (cachedDefaultField !== null && cachedDefaultField.userId === user.id) {
+          setFields([cachedDefaultField]);
+        }
+
         const fetchedFields = await fieldApi.getFieldsForUser(user.id);
         setFields(fetchedFields);
+        cacheDefaultField(user.id, extractDefaultField(fetchedFields));
       } catch (loadError) {
         setFieldLoadError(loadError instanceof Error ? loadError.message : 'Unknown error');
       }
     };
 
     loadFields();
-  }, [user]);
+  }, [user, cacheDefaultField, getCachedDefaultField]);
 
   const isEditing = editingField !== null;
+  const defaultField = useMemo(() => fields.find((field) => field.isDefault) ?? null, [fields]);
 
-  const sortedFields = useMemo(() => {
-    return [...fields].sort((firstField, secondField) =>
-      firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' })
-    );
+  const sortedNonDefaultFields = useMemo(() => {
+    return fields
+      .filter((field) => !field.isDefault)
+      .sort((firstField, secondField) =>
+        firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' })
+      );
   }, [fields]);
 
   const openCreateForm = () => {
@@ -126,6 +138,7 @@ export function HomePage() {
         updatedFields = await fieldApi.createField(user.id, payload);
       }
       setFields(updatedFields);
+      cacheDefaultField(user.id, extractDefaultField(updatedFields));
       closeForm();
     } catch (submitError) {
       setFormError(submitError instanceof Error ? submitError.message : 'Unknown error');
@@ -146,8 +159,29 @@ export function HomePage() {
     try {
       const updatedFields = await fieldApi.deleteField(user.id, fieldId);
       setFields(updatedFields);
+      cacheDefaultField(user.id, extractDefaultField(updatedFields));
     } catch (deleteError) {
       setFormError(deleteError instanceof Error ? deleteError.message : 'Unknown error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onToggleDefault = async (fieldId: string, isCurrentlyDefault: boolean) => {
+    if (!user) {
+      setFormError('No user loaded.');
+      return;
+    }
+
+    setFormError(null);
+    setIsSubmitting(true);
+
+    try {
+      const updatedFields = await fieldApi.setFieldDefault(user.id, fieldId, !isCurrentlyDefault);
+      setFields(updatedFields);
+      cacheDefaultField(user.id, extractDefaultField(updatedFields));
+    } catch (toggleError) {
+      setFormError(toggleError instanceof Error ? toggleError.message : 'Unknown error');
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +208,7 @@ export function HomePage() {
 
       <section className="bg-white rounded-lg shadow-md p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-gray-800">Your fields ({sortedFields.length})</h2>
+          <h2 className="text-xl font-semibold text-gray-800">Your fields ({fields.length})</h2>
           <button
             type="button"
             className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
@@ -188,11 +222,89 @@ export function HomePage() {
         <div className="rounded-md border border-gray-200">
           <div className="p-4">
             {fieldLoadError ? <p className="text-red-600 text-sm mb-2">{fieldLoadError}</p> : null}
-            {sortedFields.length === 0 ? (
-              <p className="text-gray-600">No fields yet. Add your first one.</p>
+            {defaultField ? (
+              <article className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
+                <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Default field</p>
+                    <p className="font-semibold text-gray-900">{defaultField.name}</p>
+                    {defaultField.address ? <p className="text-gray-600">{defaultField.address}</p> : null}
+                    <p className="text-sm text-gray-500">
+                      Lat: {defaultField.latitude ?? '-'} | Lng: {defaultField.longitude ?? '-'}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      aria-label={`Remove ${defaultField.name} as default field`}
+                      title="Unset default field"
+                      className="rounded p-1 text-red-500 hover:bg-gray-100 disabled:opacity-60"
+                      onClick={() => onToggleDefault(defaultField.id, true)}
+                      disabled={isSubmitting}
+                    >
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+                        <path d="M12 21.35 10.55 20.03C5.4 15.36 2 12.27 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09A5.99 5.99 0 0 1 16.5 3C19.58 3 22 5.42 22 8.5c0 3.77-3.4 6.86-8.55 11.54L12 21.35Z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => openEditForm(defaultField.id)}
+                      disabled={isSubmitting}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50"
+                      onClick={() => onDelete(defaultField.id)}
+                      disabled={isSubmitting}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3 border-t border-blue-100 pt-3">
+                  {defaultField.weather?.status === 'ok' && defaultField.weather.days.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <div className="flex min-w-max gap-2">
+                        {defaultField.weather.days.map((dayWeather) => (
+                          <article
+                            key={dayWeather.date}
+                            className="w-44 shrink-0 rounded-md border border-blue-200 bg-white p-2"
+                          >
+                            <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
+                            <p className="text-xs text-gray-600">
+                              Temp: {dayWeather.temperatureC !== null ? `${dayWeather.temperatureC} °C` : '-'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Wind: {dayWeather.windSpeedMs !== null ? `${dayWeather.windSpeedMs} m/s` : '-'}
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              Confidence: {confidenceLabel(dayWeather.confidenceLevel)}
+                            </p>
+                          </article>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      {defaultField.weather?.message ?? 'Weather forecast unavailable for this field.'}
+                    </p>
+                  )}
+                </div>
+              </article>
+            ) : null}
+            {sortedNonDefaultFields.length === 0 ? (
+              <p className="text-gray-600">
+                {defaultField ? 'No other fields yet.' : 'No fields yet. Add your first one.'}
+              </p>
             ) : (
               <ul className="max-h-80 overflow-y-auto space-y-3 pr-1">
-                {sortedFields.map((field) => (
+                {sortedNonDefaultFields.map((field) => (
                   <li key={field.id} className="rounded-md border border-gray-200 p-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="space-y-1">
@@ -204,6 +316,18 @@ export function HomePage() {
                       </div>
 
                       <div className="flex gap-2">
+                        <button
+                          type="button"
+                          aria-label={`Set ${field.name} as default field`}
+                          title="Set as default field"
+                          className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-red-500 disabled:opacity-60"
+                          onClick={() => onToggleDefault(field.id, false)}
+                          disabled={isSubmitting}
+                        >
+                          <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+                            <path d="M16.5 3A5.99 5.99 0 0 0 12 5.09 5.99 5.99 0 0 0 7.5 3C4.42 3 2 5.42 2 8.5c0 3.77 3.4 6.86 8.55 11.54L12 21.35l1.45-1.31C18.6 15.36 22 12.27 22 8.5 22 5.42 19.58 3 16.5 3Zm-4.4 15.55-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87A3.96 3.96 0 0 1 16.5 5C18.5 5 20 6.5 20 8.5c0 2.89-3.14 5.74-7.9 10.05Z" />
+                          </svg>
+                        </button>
                         <button
                           type="button"
                           className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"

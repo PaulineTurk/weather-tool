@@ -2,12 +2,14 @@ import { fieldRepository, Field, FieldPayload } from './fieldRepository';
 import prisma from '../db';
 
 jest.mock('../db', () => ({
+  $transaction: jest.fn(),
   field: {
     findMany: jest.fn(),
     create: jest.fn(),
     findFirst: jest.fn(),
     update: jest.fn(),
     deleteMany: jest.fn(),
+    updateMany: jest.fn(),
   },
 }));
 
@@ -152,6 +154,57 @@ describe('fieldRepository', () => {
     expect(result).toBe(true);
     expect(mockPrisma.field.deleteMany).toHaveBeenCalledWith({
       where: { id: 'f4', userId: 'user-1' },
+    });
+  });
+
+  it('sets the selected field as default and clears previous default', async () => {
+    const existingField: Field = {
+      id: 'f1',
+      name: 'Alpha',
+      latitude: null,
+      longitude: null,
+      address: null,
+      isDefault: false,
+      userId: 'user-1',
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
+    };
+
+    mockPrisma.field.findFirst.mockResolvedValue(existingField);
+    mockPrisma.$transaction.mockResolvedValue([]);
+
+    const result = await fieldRepository.setDefaultFieldForUser('user-1', 'f1');
+
+    expect(result).toBe(true);
+    expect(mockPrisma.field.updateMany).toHaveBeenCalledWith({
+      where: { userId: 'user-1', isDefault: true },
+      data: { isDefault: false },
+    });
+    expect(mockPrisma.field.update).toHaveBeenCalledWith({
+      where: { id: 'f1' },
+      data: { isDefault: true },
+    });
+    expect(mockPrisma.$transaction).toHaveBeenCalled();
+  });
+
+  it('returns false when setting default on unknown field', async () => {
+    mockPrisma.field.findFirst.mockResolvedValue(null);
+
+    const result = await fieldRepository.setDefaultFieldForUser('user-1', 'missing');
+
+    expect(result).toBe(false);
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('clears default status on a field', async () => {
+    mockPrisma.field.updateMany.mockResolvedValue({ count: 1 });
+
+    const result = await fieldRepository.clearDefaultFieldForUser('user-1', 'f1');
+
+    expect(result).toBe(true);
+    expect(mockPrisma.field.updateMany).toHaveBeenCalledWith({
+      where: { id: 'f1', userId: 'user-1' },
+      data: { isDefault: false },
     });
   });
 });

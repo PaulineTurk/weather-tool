@@ -11,6 +11,8 @@ jest.mock('../repositories/fieldRepository', () => ({
     createFieldForUser: jest.fn(),
     updateFieldForUser: jest.fn(),
     deleteFieldForUser: jest.fn(),
+    setDefaultFieldForUser: jest.fn(),
+    clearDefaultFieldForUser: jest.fn(),
   },
 }));
 
@@ -29,6 +31,7 @@ const createApp = () => {
   app.get('/fields/:userId', (req, res) => fieldController.getFieldsForUser(req, res));
   app.post('/fields/:userId', (req, res) => fieldController.createFieldForUser(req, res));
   app.put('/fields/:userId/:fieldId', (req, res) => fieldController.updateFieldForUser(req, res));
+  app.patch('/fields/:userId/:fieldId/default', (req, res) => fieldController.setDefaultFieldForUser(req, res));
   app.delete('/fields/:userId/:fieldId', (req, res) => fieldController.deleteFieldForUser(req, res));
   return app;
 };
@@ -164,5 +167,35 @@ describe('fieldController', () => {
       }),
     ]);
     expect(mockFieldRepository.deleteFieldForUser).toHaveBeenCalledWith('user-1', 'f9');
+  });
+
+  it('sets default field and returns refreshed list', async () => {
+    const app = createApp();
+    const refreshedFields: Field[] = [
+      {
+        id: 'f2',
+        name: 'Beta',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: 'user-1',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date('2024-01-01'),
+      },
+    ];
+
+    mockFieldRepository.setDefaultFieldForUser.mockResolvedValue(true);
+    mockFieldRepository.getFieldsForUser.mockResolvedValue(refreshedFields);
+
+    const response = await request(app).patch('/fields/user-1/f2/default').send({ isDefault: true }).expect(200);
+
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: 'f2',
+        isDefault: true,
+      }),
+    ]);
+    expect(mockFieldRepository.setDefaultFieldForUser).toHaveBeenCalledWith('user-1', 'f2');
   });
 });

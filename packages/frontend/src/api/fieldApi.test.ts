@@ -67,4 +67,15 @@ describe('fieldApi', () => {
       expect.objectContaining({ method: 'DELETE' })
     );
   });
+
+  it('updates default field selection', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([])));
+
+    await fieldApi.setFieldDefault('user-1', 'field-1', true);
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/fields/users/user-1/field-1/default',
+      expect.objectContaining({ method: 'PATCH' })
+    );
+  });
 });

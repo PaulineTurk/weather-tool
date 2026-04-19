@@ -86,4 +86,18 @@ export const fieldApi = {
 
     return response.json();
   },
+
+  async setFieldDefault(userId: string, fieldId: string, isDefault: boolean): Promise<Field[]> {
+    const response = await fetch(`/api/fields/users/${userId}/${fieldId}/default`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ isDefault }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update default field');
+    }
+
+    return response.json();
+  },
 };

@@ -21,6 +21,10 @@ jest.mock('../controllers/fieldController', () => ({
       res.json([{ id: 'f1', name: 'Edited' }]);
       return Promise.resolve();
     }),
+    setDefaultFieldForUser: jest.fn((req, res) => {
+      res.json([{ id: 'f1', name: 'Alpha', isDefault: true }]);
+      return Promise.resolve();
+    }),
     deleteFieldForUser: jest.fn((req, res) => {
       res.json([]);
       return Promise.resolve();
@@ -71,5 +75,10 @@ describe('fieldRoutes', () => {
   it('routes DELETE /users/:userId/:fieldId to deleteFieldForUser', async () => {
     await request(app).delete('/api/fields/users/user-1/field-1').expect(200);
     expect(mockFieldController.deleteFieldForUser).toHaveBeenCalled();
+  });
+
+  it('routes PATCH /users/:userId/:fieldId/default to setDefaultFieldForUser', async () => {
+    await request(app).patch('/api/fields/users/user-1/field-1/default').send({ isDefault: true }).expect(200);
+    expect(mockFieldController.setDefaultFieldForUser).toHaveBeenCalled();
   });
 });

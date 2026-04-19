@@ -9,6 +9,7 @@ import { fieldApi } from '../api/fieldApi';
 
 describe('HomePage', () => {
   beforeEach(() => {
+    localStorage.clear();
     useUserStore.setState(useUserStore.getInitialState());
     vi.clearAllMocks();
     vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([]);
@@ -162,6 +163,128 @@ describe('HomePage', () => {
     expect(await screen.findByText('Zulu')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: /delete/i }));
+    expect(await screen.findByText(/no fields yet/i)).toBeVisible();
+  });
+
+  it('moves selected default field to dedicated top section', async () => {
+    vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
+      id: '1',
+      name: 'Test User',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
+
+    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+      {
+        id: 'f2',
+        name: 'Beta',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    vi.spyOn(fieldApi, 'setFieldDefault').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+      {
+        id: 'f2',
+        name: 'Beta',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    render(<HomePage />);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /set alpha as default field/i }));
+
+    expect(await screen.findByText('Default field')).toBeVisible();
+    expect(screen.getByRole('button', { name: /remove alpha as default field/i })).toBeVisible();
+    expect(fieldApi.setFieldDefault).toHaveBeenCalledWith('1', 'f1', true);
+    expect(screen.getByRole('heading', { name: /your fields \(2\)/i })).toBeVisible();
+  });
+
+  it('allows editing and deleting the default field', async () => {
+    vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
+      id: '1',
+      name: 'Test User',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
+
+    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    vi.spyOn(fieldApi, 'updateField').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha Prime',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    vi.spyOn(fieldApi, 'deleteField').mockResolvedValue([]);
+
+    render(<HomePage />);
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: /^edit$/i }));
+    const nameInput = screen.getByRole('textbox', { name: /name/i });
+    await user.clear(nameInput);
+    await user.type(nameInput, 'Alpha Prime');
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+
+    expect(await screen.findByText('Alpha Prime')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
     expect(await screen.findByText(/no fields yet/i)).toBeVisible();
   });
 });

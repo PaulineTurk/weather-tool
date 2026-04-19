@@ -72,4 +72,53 @@ export const fieldRepository = {
 
     return result.count === 1;
   },
+
+  async setDefaultFieldForUser(userId: string, fieldId: string): Promise<boolean> {
+    const field = await prisma.field.findFirst({
+      where: {
+        id: fieldId,
+        userId,
+      },
+    });
+
+    if (!field) {
+      return false;
+    }
+
+    await prisma.$transaction([
+      prisma.field.updateMany({
+        where: {
+          userId,
+          isDefault: true,
+        },
+        data: {
+          isDefault: false,
+        },
+      }),
+      prisma.field.update({
+        where: {
+          id: fieldId,
+        },
+        data: {
+          isDefault: true,
+        },
+      }),
+    ]);
+
+    return true;
+  },
+
+  async clearDefaultFieldForUser(userId: string, fieldId: string): Promise<boolean> {
+    const result = await prisma.field.updateMany({
+      where: {
+        id: fieldId,
+        userId,
+      },
+      data: {
+        isDefault: false,
+      },
+    });
+
+    return result.count === 1;
+  },
 };

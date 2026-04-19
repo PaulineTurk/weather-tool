@@ -12,8 +12,10 @@ const mockUserApi = vi.mocked(userApi)
 
 describe('userStore', () => {
   afterEach(() => {
+    localStorage.clear();
     useUserStore.setState({
       user: null,
+      defaultField: null,
       isLoading: false,
       error: null,
     });
@@ -34,6 +36,11 @@ describe('userStore', () => {
     it('should start with null error', () => {
       const { error } = useUserStore.getState();
       expect(error).toBeNull();
+    });
+
+    it('should start with null default field', () => {
+      const { defaultField } = useUserStore.getState();
+      expect(defaultField).toBeNull();
     });
   });
 
@@ -69,6 +76,40 @@ describe('userStore', () => {
       expect(user).toEqual(mockUser);
       expect(isLoading).toBe(false);
       expect(error).toBeNull();
+    });
+
+    it('should load cached default field on successful fetch', async () => {
+      const mockUser = {
+        id: 'default-user',
+        name: 'Default User',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      };
+
+      localStorage.setItem('user-default-field-cache', JSON.stringify({
+        userId: 'default-user',
+        field: {
+          id: 'f1',
+          name: 'Alpha',
+          latitude: null,
+          longitude: null,
+          address: null,
+          isDefault: true,
+          userId: 'default-user',
+          createdAt: '2024-01-01T00:00:00.000Z',
+          updatedAt: '2024-01-01T00:00:00.000Z',
+        },
+      }));
+
+      mockUserApi.getDefaultUser.mockResolvedValue(mockUser);
+
+      await act(async () => {
+        await useUserStore.getState().fetchUser();
+      });
+
+      const { defaultField } = useUserStore.getState();
+      expect(defaultField).not.toBeNull();
+      expect(defaultField?.id).toBe('f1');
     });
 
     it('should set error state on failed fetch', async () => {
@@ -111,6 +152,46 @@ describe('userStore', () => {
 
       const { error } = useUserStore.getState();
       expect(error).toBe('Unknown error');
+    });
+  });
+
+  describe('default field cache', () => {
+    it('should cache default field in localStorage', () => {
+      useUserStore.getState().cacheDefaultField('user-1', {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      });
+
+      const { defaultField } = useUserStore.getState();
+      expect(defaultField?.id).toBe('f1');
+      expect(localStorage.getItem('user-default-field-cache')).not.toBeNull();
+    });
+
+    it('should clear cached default field', () => {
+      useUserStore.getState().cacheDefaultField('user-1', {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: true,
+        userId: 'user-1',
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      });
+
+      useUserStore.getState().cacheDefaultField('user-1', null);
+
+      const { defaultField } = useUserStore.getState();
+      expect(defaultField).toBeNull();
+      expect(localStorage.getItem('user-default-field-cache')).toBeNull();
     });
   });
 });

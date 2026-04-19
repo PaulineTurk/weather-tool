@@ -58,6 +58,23 @@ const normalizeFieldPayload = (body: unknown): FieldPayload | null => {
   };
 };
 
+const normalizeDefaultPayload = (body: unknown): boolean | null => {
+  if (typeof body !== 'object' || body === null) {
+    return true;
+  }
+
+  const rawIsDefault = getProperty(body, 'isDefault');
+  if (typeof rawIsDefault === 'undefined') {
+    return true;
+  }
+
+  if (typeof rawIsDefault !== 'boolean') {
+    return null;
+  }
+
+  return rawIsDefault;
+};
+
 export const fieldController = {
   async enrichFieldsWithWeather(userId: string) {
     const fields = await fieldRepository.getFieldsForUser(userId);
@@ -148,6 +165,33 @@ export const fieldController = {
       const deleted = await fieldRepository.deleteFieldForUser(userId, fieldId);
 
       if (!deleted) {
+        res.status(404).json({ error: 'Field not found' });
+        return;
+      }
+
+      const fields = await fieldController.enrichFieldsWithWeather(userId);
+      res.json(fields);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
+  async setDefaultFieldForUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      const fieldId = req.params.fieldId;
+      const shouldSetDefault = normalizeDefaultPayload(req.body);
+
+      if (shouldSetDefault === null) {
+        res.status(400).json({ error: 'Invalid default payload' });
+        return;
+      }
+
+      const updated = shouldSetDefault
+        ? await fieldRepository.setDefaultFieldForUser(userId, fieldId)
+        : await fieldRepository.clearDefaultFieldForUser(userId, fieldId);
+
+      if (!updated) {
         res.status(404).json({ error: 'Field not found' });
         return;
       }
