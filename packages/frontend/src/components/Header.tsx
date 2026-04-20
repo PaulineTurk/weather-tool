@@ -10,8 +10,9 @@ export function Header() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between gap-2 rounded-b-lg bg-white px-3 py-3 shadow-md sm:px-4">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-        <button onClick={() => navigate('/')}>
-          <img src="/assets/logo.png" alt="Weather Tool logo" className="h-9 w-9 rounded object-cover sm:h-10 sm:w-10" />
+        <button onClick={() => navigate('/')} className="flex shrink-0 flex-col items-center leading-none">
+          <img src="/assets/logo.png" alt="AgriWatch logo" className="h-9 w-9 rounded object-cover sm:h-10 sm:w-10" />
+          <span className="mt-1 text-[10px] font-semibold text-gray-700 sm:text-xs">AgriWatch</span>
         </button>
         <span className="max-w-[8rem] truncate text-sm font-bold text-gray-700 sm:max-w-none sm:text-lg">
           Welcome {user.name}
