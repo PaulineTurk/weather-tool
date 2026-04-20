@@ -69,8 +69,8 @@ export function HomePage() {
   }
 
   return (
-    <main className="mx-auto flex h-screen flex-col space-y-4 overflow-hidden px-3 pt-20 pb-3 sm:px-4">
-      <section className="flex min-h-0 flex-1 flex-col space-y-4 rounded-lg bg-white p-4 shadow-md sm:p-6 lg:p-10">
+    <main className="flex h-screen flex-col overflow-hidden pt-20">
+      <section className="flex min-h-0 flex-1 flex-col space-y-4 bg-white p-4 sm:p-6 lg:p-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
             <h2 className="text-xl font-semibold text-gray-800">
