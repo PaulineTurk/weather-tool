@@ -1,93 +1,40 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useUserStore } from '../store/userStore';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { Field, FieldPayload, fieldApi } from '../api/fieldApi';
-
-const parseOptionalNumber = (value: FormDataEntryValue | null): number | null => {
-  if (typeof value !== 'string' || value.trim().length === 0) {
-    return null;
-  }
-
-  const parsed = Number.parseFloat(value);
-  return Number.isNaN(parsed) ? null : parsed;
-};
-
-const confidenceLabel = (level: 'high' | 'medium' | 'low' | 'unknown'): string => {
-  if (level === 'high') {
-    return 'High';
-  }
-
-  if (level === 'medium') {
-    return 'Medium';
-  }
-
-  if (level === 'low') {
-    return 'Low';
-  }
-
-  return 'Unknown';
-};
-
-const displayTemperature = (temperatureC: number | null, unit: 'C' | 'F'): string => {
-  if (temperatureC === null) {
-    return '-';
-  }
-
-  if (unit === 'F') {
-    return `${Math.round((temperatureC * 9) / 5 + 32)} °F`;
-  }
-
-  return `${temperatureC} °C`;
-};
-const extractDefaultField = (currentFields: Field[]): Field | null => {
-  return currentFields.find((field) => field.isDefault) ?? null;
-};
+import type { Field } from '../api/fieldApi';
+import { FieldFormModal } from './home/FieldFormModal';
+import { FieldWeatherPanel } from './home/FieldWeatherPanel';
+import { useFields } from './home/useFields';
 
 export function HomePage() {
   const { user, isLoading, error, fetchUser, cacheDefaultField, getCachedDefaultField } = useUserStore();
-  const [fields, setFields] = useState<Field[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [areFieldsLoading, setAreFieldsLoading] = useState(false);
-  const [fieldLoadError, setFieldLoadError] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingField, setEditingField] = useState<Field | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
-  useEffect(() => {
-    const loadFields = async () => {
-      if (!user) {
-        return;
-      }
-
-      setAreFieldsLoading(true);
-      try {
-        setFieldLoadError(null);
-        const cachedDefaultField = getCachedDefaultField(user.id);
-        if (cachedDefaultField !== null && cachedDefaultField.userId === user.id) {
-          setFields([cachedDefaultField]);
-        }
-
-        const fetchedFields = await fieldApi.getFieldsForUser(user.id);
-        setFields(fetchedFields);
-        cacheDefaultField(user.id, extractDefaultField(fetchedFields));
-      } catch (loadError) {
-        setFieldLoadError(loadError instanceof Error ? loadError.message : 'Unknown error');
-      } finally {
-        setAreFieldsLoading(false);
-      }
-    };
-
-    loadFields();
-  }, [user, cacheDefaultField, getCachedDefaultField]);
-
-  const isEditing = editingField !== null;
-  const defaultField = useMemo(() => fields.find((field) => field.isDefault) ?? null, [fields]);
+  const {
+    fields,
+    defaultField,
+    areFieldsLoading,
+    fieldLoadError,
+    isFormOpen,
+    editingField,
+    formError,
+    isSubmitting,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    createOrUpdate,
+    onDelete,
+    onToggleDefault,
+  } = useFields({
+    userId: user?.id ?? null,
+    cacheDefaultField,
+    getCachedDefaultField,
+  });
 
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery]);
   const matchesSearch = (field: Field) =>
@@ -106,113 +53,6 @@ export function HomePage() {
         firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' })
       );
   }, [filteredFields]);
-
-  const openCreateForm = () => {
-    setEditingField(null);
-    setFormError(null);
-    setIsFormOpen(true);
-  };
-
-  const openEditForm = (fieldId: string) => {
-    const field = fields.find((currentField) => currentField.id === fieldId);
-
-    if (!field) {
-      return;
-    }
-
-    setEditingField(field);
-    setFormError(null);
-    setIsFormOpen(true);
-  };
-
-  const closeForm = () => {
-    setIsFormOpen(false);
-    setEditingField(null);
-    setFormError(null);
-  };
-
-  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!user) {
-      setFormError('No user loaded.');
-      return;
-    }
-
-    const formData = new FormData(event.currentTarget);
-    const rawName = formData.get('name');
-    const rawAddress = formData.get('address');
-
-    if (typeof rawName !== 'string' || rawName.trim().length === 0) {
-      setFormError('Field name is required.');
-      return;
-    }
-
-    const payload: FieldPayload = {
-      name: rawName.trim(),
-      address: typeof rawAddress === 'string' && rawAddress.trim().length > 0 ? rawAddress.trim() : null,
-      latitude: parseOptionalNumber(formData.get('latitude')),
-      longitude: parseOptionalNumber(formData.get('longitude')),
-    };
-
-    setFormError(null);
-    setIsSubmitting(true);
-
-    try {
-      let updatedFields: Field[];
-      if (editingField) {
-        updatedFields = await fieldApi.updateField(user.id, editingField.id, payload);
-      } else {
-        updatedFields = await fieldApi.createField(user.id, payload);
-      }
-      setFields(updatedFields);
-      cacheDefaultField(user.id, extractDefaultField(updatedFields));
-      closeForm();
-    } catch (submitError) {
-      setFormError(submitError instanceof Error ? submitError.message : 'Unknown error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onDelete = async (fieldId: string) => {
-    if (!user) {
-      setFormError('No user loaded.');
-      return;
-    }
-
-    setFormError(null);
-    setIsSubmitting(true);
-
-    try {
-      const updatedFields = await fieldApi.deleteField(user.id, fieldId);
-      setFields(updatedFields);
-      cacheDefaultField(user.id, extractDefaultField(updatedFields));
-    } catch (deleteError) {
-      setFormError(deleteError instanceof Error ? deleteError.message : 'Unknown error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onToggleDefault = async (fieldId: string, isCurrentlyDefault: boolean) => {
-    if (!user) {
-      setFormError('No user loaded.');
-      return;
-    }
-
-    setFormError(null);
-    setIsSubmitting(true);
-
-    try {
-      const updatedFields = await fieldApi.setFieldDefault(user.id, fieldId, !isCurrentlyDefault);
-      setFields(updatedFields);
-      cacheDefaultField(user.id, extractDefaultField(updatedFields));
-    } catch (toggleError) {
-      setFormError(toggleError instanceof Error ? toggleError.message : 'Unknown error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -301,36 +141,12 @@ export function HomePage() {
                   </div>
                 </div>
                 <div className="mt-3 border-t border-blue-100 pt-3">
-                  {filteredDefaultField.weather?.status === 'ok' && filteredDefaultField.weather.days.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <div className="flex min-w-max gap-2">
-                        {filteredDefaultField.weather.days.map((dayWeather) => (
-                          <article
-                            key={dayWeather.date}
-                            className="w-44 shrink-0 rounded-md border border-blue-200 bg-white p-2"
-                          >
-                            <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
-                            <p className="text-xs text-gray-600">
-                              Temp: {displayTemperature(dayWeather.temperatureC, user.temperatureUnit)}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Wind: {dayWeather.windSpeedMs !== null ? `${dayWeather.windSpeedMs} m/s` : '-'}
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              Confidence: {confidenceLabel(dayWeather.confidenceLevel)}
-                            </p>
-                          </article>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500">
-                      {filteredDefaultField.weather?.message ?? 'Weather forecast unavailable for this field.'}
-                    </p>
-                  )}
+                  <FieldWeatherPanel
+                    weather={filteredDefaultField.weather}
+                    unit={user.temperatureUnit}
+                    dayCardClassName="w-44 shrink-0 rounded-md border border-blue-200 bg-white p-2"
+                    emptyClassName="text-sm text-gray-500"
+                  />
                 </div>
               </article>
             ) : null}
@@ -388,36 +204,12 @@ export function HomePage() {
                     </div>
 
                     <div className="mt-3 border-t border-gray-100 pt-3">
-                      {field.weather?.status === 'ok' && field.weather.days.length > 0 ? (
-                        <div className="overflow-x-auto">
-                          <div className="flex min-w-max gap-2">
-                            {field.weather.days.map((dayWeather) => (
-                              <article
-                                key={dayWeather.date}
-                                className="w-44 shrink-0 rounded-md border border-gray-200 bg-gray-50 p-2"
-                              >
-                                <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
-                                <p className="text-xs text-gray-600">
-                                  Temp: {displayTemperature(dayWeather.temperatureC, user.temperatureUnit)}
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  Wind: {dayWeather.windSpeedMs !== null ? `${dayWeather.windSpeedMs} m/s` : '-'}
-                                </p>
-                                <p className="text-xs text-gray-600">
-                                  Confidence: {confidenceLabel(dayWeather.confidenceLevel)}
-                                </p>
-                              </article>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">
-                          {field.weather?.message ?? 'Weather forecast unavailable for this field.'}
-                        </p>
-                      )}
+                      <FieldWeatherPanel
+                        weather={field.weather}
+                        unit={user.temperatureUnit}
+                        dayCardClassName="w-44 shrink-0 rounded-md border border-gray-200 bg-gray-50 p-2"
+                        emptyClassName="text-sm text-gray-500"
+                      />
                     </div>
                   </li>
                 ))}
@@ -427,89 +219,14 @@ export function HomePage() {
         </div>
       </section>
 
-      {isFormOpen ? (
-        <section
-          className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 px-4"
-          aria-label="field form modal"
-        >
-          <form className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg space-y-4" onSubmit={onSubmit}>
-            <h3 className="text-lg font-semibold text-gray-900">
-              {isEditing ? 'Edit field' : 'Create field'}
-            </h3>
-
-            <label className="block text-sm font-medium text-gray-700">
-              Name *
-              <input
-                name="name"
-                type="text"
-                defaultValue={editingField?.name ?? ''}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-                required
-              />
-            </label>
-
-            <label className="block text-sm font-medium text-gray-700">
-              Address
-              <input
-                name="address"
-                type="text"
-                defaultValue={editingField?.address ?? ''}
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-              />
-            </label>
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Latitude
-                <input
-                  name="latitude"
-                  type="number"
-                  step="any"
-                  min={-90}
-                  max={90}
-                  inputMode="decimal"
-                  defaultValue={editingField?.latitude !== null && editingField?.latitude !== undefined ? String(editingField.latitude) : ''}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-                />
-              </label>
-
-              <label className="block text-sm font-medium text-gray-700">
-                Longitude
-                <input
-                  name="longitude"
-                  type="number"
-                  step="any"
-                  min={-180}
-                  max={180}
-                  inputMode="decimal"
-                  defaultValue={editingField?.longitude !== null && editingField?.longitude !== undefined ? String(editingField.longitude) : ''}
-                  className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
-                />
-              </label>
-            </div>
-
-            {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
-                onClick={closeForm}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-60"
-                disabled={isSubmitting}
-              >
-                {isEditing ? 'Save changes' : 'Create field'}
-              </button>
-            </div>
-          </form>
-        </section>
-      ) : null}
+      <FieldFormModal
+        isOpen={isFormOpen}
+        editingField={editingField}
+        isSubmitting={isSubmitting}
+        error={formError}
+        onClose={closeForm}
+        onSubmit={createOrUpdate}
+      />
     </main>
   );
 }
