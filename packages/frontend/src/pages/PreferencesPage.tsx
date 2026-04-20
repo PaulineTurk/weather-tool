@@ -1,18 +1,40 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { userApi } from '../api/userApi';
 import { useUserStore } from '../store/userStore';
 import { useNavigate } from 'react-router';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 
 export function PreferencesPage() {
   const navigate = useNavigate();
-  const { user, setUser } = useUserStore();
+  const { user, setUser, isLoading, error, fetchUser } = useUserStore();
   const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>(user?.temperatureUnit ?? 'C');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user && !isLoading && !error) {
+      fetchUser();
+    }
+  }, [user, isLoading, error, fetchUser]);
+
+  useEffect(() => {
+    if (user) {
+      setTemperatureUnit(user.temperatureUnit);
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return <ErrorMessage message={error} onRetry={() => fetchUser()} />;
+  }
 
   if (!user) {
-    return null;
+    return <ErrorMessage message="No user found" onRetry={() => fetchUser()} />;
   }
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -22,11 +44,11 @@ export function PreferencesPage() {
     const forecastDays = typeof daysValue === 'string' ? Number.parseInt(daysValue, 10) : Number.NaN;
 
     if (!Number.isInteger(forecastDays) || forecastDays < 1 || forecastDays > 10) {
-      setError('Invalid preferences.');
+      setFormError('Invalid preferences.');
       return;
     }
 
-    setError(null);
+    setFormError(null);
     setIsSubmitting(true);
     try {
       const updatedUser = await userApi.updateUserPreferences(user.id, {
@@ -36,7 +58,7 @@ export function PreferencesPage() {
       setUser(updatedUser);
       navigate('/');
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Unknown error');
+      setFormError(submitError instanceof Error ? submitError.message : 'Unknown error');
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +124,7 @@ export function PreferencesPage() {
             </select>
           </label>
 
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
+          {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
 
           <div className="flex justify-end gap-2">
             <button
