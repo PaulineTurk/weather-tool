@@ -1,12 +1,11 @@
 import { FormEvent, useState } from 'react';
 import { userApi } from '../api/userApi';
 import { useUserStore } from '../store/userStore';
+import { useNavigate } from 'react-router';
 
-type PreferencesPageProps = {
-  onBackHome: () => void;
-};
 
-export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
+export function PreferencesPage() {
+  const navigate = useNavigate();
   const { user, setUser } = useUserStore();
   const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>(user?.temperatureUnit ?? 'C');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +34,7 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
         forecastDays,
       });
       setUser(updatedUser);
-      onBackHome();
+      navigate('/');
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Unknown error');
     } finally {
@@ -109,7 +108,7 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
             <button
               type="button"
               className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
-              onClick={onBackHome}
+              onClick={() => navigate('/')}
               disabled={isSubmitting}
             >
               Cancel
@@ -124,6 +123,6 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
           </div>
         </form>
       </section>
-    </main>
+    </main >
   );
 }

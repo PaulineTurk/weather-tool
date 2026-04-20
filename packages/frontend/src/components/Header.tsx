@@ -1,17 +1,17 @@
-import { User } from '../api/userApi';
+import { useNavigate } from 'react-router';
+import { useUserStore } from '../store/userStore';
 
-type HeaderProps = {
-  user: User;
-  onOpenAppLogo: () => void;
-  onOpenPreferences: () => void;
-};
-
-export function Header({ user, onOpenAppLogo, onOpenPreferences }: HeaderProps) {
+export function Header() {
+  const navigate = useNavigate();
+  const { user } = useUserStore();
+  if (!user) {
+    return null;
+  }
   return (
     <header className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between rounded-b-lg bg-white p-4 shadow-md">
       <div className="flex items-center gap-3">
         <button
-          onClick={onOpenAppLogo}
+          onClick={() => navigate('/')}
         >
           <img src="/assets/logo.png" alt="Weather Tool logo" className="h-10 w-10 rounded object-cover" />
         </button>
@@ -20,11 +20,11 @@ export function Header({ user, onOpenAppLogo, onOpenPreferences }: HeaderProps) 
 
       <button
         type="button"
-        onClick={onOpenPreferences}
+        onClick={() => navigate('/preferences')}
         className="flex flex-col items-center gap-1 rounded-md px-3 py-2 hover:bg-gray-100"
       >
         <img className="h-8 w-8" src='/assets/gear.png' />
       </button>
-    </header>
+    </header >
   );
 }
