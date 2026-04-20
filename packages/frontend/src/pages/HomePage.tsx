@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useUserStore } from '../store/userStore';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
-import type { Field } from '../api/fieldApi';
 import { FieldFormModal } from './home/FieldFormModal';
 import { FieldWeatherPanel } from './home/FieldWeatherPanel';
 import { useFields } from './home/useFields';
@@ -37,20 +36,23 @@ export function HomePage() {
   });
 
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery]);
-  const matchesSearch = (field: Field) =>
-    normalizedSearchQuery.length === 0 || field.name.toLocaleLowerCase().includes(normalizedSearchQuery);
+  const filteredFields = useMemo(() => {
+    if (normalizedSearchQuery.length === 0) {
+      return fields;
+    }
 
-  const filteredFields = useMemo(() => fields.filter(matchesSearch), [fields, normalizedSearchQuery]);
+    return fields.filter((field) => field.name.toLocaleLowerCase().includes(normalizedSearchQuery));
+  }, [fields, normalizedSearchQuery]);
   const filteredDefaultField = useMemo(
     () => filteredFields.find((field) => field.isDefault) ?? null,
-    [filteredFields]
+    [filteredFields],
   );
 
   const sortedNonDefaultFields = useMemo(() => {
     return filteredFields
       .filter((field) => !field.isDefault)
       .sort((firstField, secondField) =>
-        firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' })
+        firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' }),
       );
   }, [filteredFields]);
 
@@ -71,7 +73,9 @@ export function HomePage() {
       <section className="bg-white rounded-lg shadow-md p-10 space-y-4 flex flex-col flex-1 min-h-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-xl font-semibold text-gray-800">Your fields ({filteredFields.length}/{fields.length})</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Your fields ({filteredFields.length}/{fields.length})
+            </h2>
             <label className="relative">
               <span className="sr-only">Search fields</span>
               <input
@@ -102,11 +106,16 @@ export function HomePage() {
               <article className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
                 <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Default field</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
+                      Default field
+                    </p>
                     <p className="font-semibold text-gray-900">{filteredDefaultField.name}</p>
-                    {filteredDefaultField.address ? <p className="text-gray-600">{filteredDefaultField.address}</p> : null}
+                    {filteredDefaultField.address ? (
+                      <p className="text-gray-600">{filteredDefaultField.address}</p>
+                    ) : null}
                     <p className="text-sm text-gray-500">
-                      Lat: {filteredDefaultField.latitude ?? '-'} | Lng: {filteredDefaultField.longitude ?? '-'}
+                      Lat: {filteredDefaultField.latitude ?? '-'} | Lng:{' '}
+                      {filteredDefaultField.longitude ?? '-'}
                     </p>
                   </div>
                   <div className="flex gap-2">

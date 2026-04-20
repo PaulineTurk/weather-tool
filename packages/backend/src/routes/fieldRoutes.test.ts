@@ -69,7 +69,10 @@ describe('fieldRoutes', () => {
   });
 
   it('routes PATCH /users/:userId/:fieldId/default to setDefaultFieldForUser', async () => {
-    await request(app).patch('/api/fields/users/user-1/field-1/default').send({ isDefault: true }).expect(200);
+    await request(app)
+      .patch('/api/fields/users/user-1/field-1/default')
+      .send({ isDefault: true })
+      .expect(200);
     expect(mockFieldController.setDefaultFieldForUser).toHaveBeenCalled();
   });
 });

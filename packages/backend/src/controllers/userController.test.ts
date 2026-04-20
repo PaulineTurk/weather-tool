@@ -10,7 +10,7 @@ jest.mock('../repositories/userRepository', () => ({
   },
 }));
 
-const mockUserRepository = jest.mocked(userRepository)
+const mockUserRepository = jest.mocked(userRepository);
 
 describe('userController', () => {
   let mockRequest: Partial<Request>;
@@ -38,10 +38,7 @@ describe('userController', () => {
 
       mockUserRepository.getDefaultUser.mockResolvedValue(mockUser);
 
-      await userController.getDefaultUser(
-        mockRequest as Request,
-        mockResponse as Response
-      );
+      await userController.getDefaultUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockUserRepository.getDefaultUser).toHaveBeenCalled();
       expect(mockResponse.json).toHaveBeenCalledWith(mockUser);
@@ -51,10 +48,7 @@ describe('userController', () => {
     it('should return 404 when default user is not found', async () => {
       mockUserRepository.getDefaultUser.mockResolvedValue(null);
 
-      await userController.getDefaultUser(
-        mockRequest as Request,
-        mockResponse as Response
-      );
+      await userController.getDefaultUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockUserRepository.getDefaultUser).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(404);
@@ -64,14 +58,9 @@ describe('userController', () => {
     });
 
     it('should return 500 on repository error', async () => {
-      mockUserRepository.getDefaultUser.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockUserRepository.getDefaultUser.mockRejectedValue(new Error('Database error'));
 
-      await userController.getDefaultUser(
-        mockRequest as Request,
-        mockResponse as Response
-      );
+      await userController.getDefaultUser(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({

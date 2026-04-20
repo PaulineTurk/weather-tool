@@ -13,7 +13,7 @@ export const userController = {
       }
 
       res.json(user);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -42,7 +42,7 @@ export const userController = {
       }
 
       res.json(updatedUser);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },

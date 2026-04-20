@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
 
-
 export function PreferencesPage() {
   const navigate = useNavigate();
   const { user, setUser, isLoading, error, fetchUser } = useUserStore();
@@ -84,8 +83,9 @@ export function PreferencesPage() {
                   onChange={() => setTemperatureUnit('C')}
                 />
                 <span
-                  className={`block rounded px-4 py-2 text-sm ${temperatureUnit === 'C' ? 'bg-green-600 text-white' : 'text-gray-700'
-                    }`}
+                  className={`block rounded px-4 py-2 text-sm ${
+                    temperatureUnit === 'C' ? 'bg-green-600 text-white' : 'text-gray-700'
+                  }`}
                 >
                   °C
                 </span>
@@ -100,8 +100,9 @@ export function PreferencesPage() {
                   onChange={() => setTemperatureUnit('F')}
                 />
                 <span
-                  className={`block rounded px-4 py-2 text-sm ${temperatureUnit === 'F' ? 'bg-green-600 text-white' : 'text-gray-700'
-                    }`}
+                  className={`block rounded px-4 py-2 text-sm ${
+                    temperatureUnit === 'F' ? 'bg-green-600 text-white' : 'text-gray-700'
+                  }`}
                 >
                   °F
                 </span>
@@ -145,6 +146,6 @@ export function PreferencesPage() {
           </div>
         </form>
       </section>
-    </main >
+    </main>
   );
 }

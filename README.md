@@ -23,6 +23,7 @@ weather-tool/
 ## Quick Start (Local)
 
 ### 1) Install dependencies
+
 ```bash
 pnpm install --config.confirmModulesPurge=false
 ```
@@ -36,26 +37,31 @@ FROGCAST_API_TOKEN=your_token_here
 ```
 
 Notes:
+
 - `FROGCAST_API_TOKEN` is required to retrieve weather forecasts.
 - Keep the exact `KEY=value` format (no spaces around `=`).
 - Restart backend after any `.env` change.
 
 ### 3) Generate Prisma client
+
 ```bash
 pnpm --filter @field-weather/database run generate
 ```
 
 ### 4) Run database migrations
+
 ```bash
 pnpm db:migrate
 ```
 
 ### 5) Run development servers
+
 ```bash
 pnpm dev
 ```
 
 Default URLs:
+
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:4000`
 
@@ -64,7 +70,6 @@ Default URLs:
 - Frontend calls backend routes under `/api/*`.
 - Backend calls Frogcast using `FROGCAST_API_TOKEN`.
 - There is no separate local weather server; weather is served by backend routes.
-
 
 ## Tech Stack
 

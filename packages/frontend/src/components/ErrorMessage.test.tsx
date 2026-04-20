@@ -10,7 +10,7 @@ describe('ErrorMessage', () => {
   });
 
   it('should render retry button when onRetry is provided', () => {
-    const onRetry = () => { };
+    const onRetry = () => {};
     render(<ErrorMessage message="Error" onRetry={onRetry} />);
 
     const retryButton = screen.getByRole('button', { name: /retry/i });
@@ -27,7 +27,7 @@ describe('ErrorMessage', () => {
     const onRetry = vi.fn();
     render(<ErrorMessage message="Error" onRetry={onRetry} />);
 
-    const user = userEvent.setup()
+    const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /retry/i }));
 
     expect(onRetry).toHaveBeenCalledTimes(1);

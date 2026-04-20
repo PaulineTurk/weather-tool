@@ -6,7 +6,6 @@ import { useUserStore } from '../store/userStore';
 import { userApi } from '../api/userApi';
 import { fieldApi } from '../api/fieldApi';
 
-
 describe('HomePage', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -29,9 +28,7 @@ describe('HomePage', () => {
   });
 
   it('should display loading spinner', () => {
-    vi.spyOn(userApi, 'getDefaultUser').mockImplementation(
-      () => new Promise(() => { })
-    );
+    vi.spyOn(userApi, 'getDefaultUser').mockImplementation(() => new Promise(() => {}));
 
     render(<HomePage />);
 
@@ -39,9 +36,7 @@ describe('HomePage', () => {
   });
 
   it('should display error message', async () => {
-    vi.spyOn(userApi, 'getDefaultUser').mockRejectedValue(
-      new Error('Failed to load user')
-    );
+    vi.spyOn(userApi, 'getDefaultUser').mockRejectedValue(new Error('Failed to load user'));
 
     render(<HomePage />);
 
@@ -64,21 +59,19 @@ describe('HomePage', () => {
   });
 
   it('should show greeting after retry succeeds', async () => {
-    vi.spyOn(userApi, 'getDefaultUser')
-      .mockRejectedValueOnce(new Error('Failed'))
-      .mockResolvedValueOnce({
-        id: '1',
-        name: 'Test User',
-        temperatureUnit: 'C',
-        forecastDays: 1,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01',
-      });
+    vi.spyOn(userApi, 'getDefaultUser').mockRejectedValueOnce(new Error('Failed')).mockResolvedValueOnce({
+      id: '1',
+      name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
 
     render(<HomePage />);
 
     const retryButton = await screen.findByRole('button', { name: /retry/i });
-    const user = userEvent.setup()
+    const user = userEvent.setup();
     user.click(retryButton);
 
     expect(await screen.findByText(/your fields/i)).toBeInTheDocument();

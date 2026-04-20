@@ -38,7 +38,10 @@ describe('fieldApi', () => {
       address: 'Lyon',
     });
 
-    expect(fetch).toHaveBeenCalledWith('/api/fields/users/user-1', expect.objectContaining({ method: 'POST' }));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/fields/users/user-1',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('updates a field', async () => {
@@ -53,7 +56,7 @@ describe('fieldApi', () => {
 
     expect(fetch).toHaveBeenCalledWith(
       '/api/fields/users/user-1/field-1',
-      expect.objectContaining({ method: 'PUT' })
+      expect.objectContaining({ method: 'PUT' }),
     );
   });
 
@@ -64,7 +67,7 @@ describe('fieldApi', () => {
 
     expect(fetch).toHaveBeenCalledWith(
       '/api/fields/users/user-1/field-1',
-      expect.objectContaining({ method: 'DELETE' })
+      expect.objectContaining({ method: 'DELETE' }),
     );
   });
 
@@ -75,7 +78,7 @@ describe('fieldApi', () => {
 
     expect(fetch).toHaveBeenCalledWith(
       '/api/fields/users/user-1/field-1/default',
-      expect.objectContaining({ method: 'PATCH' })
+      expect.objectContaining({ method: 'PATCH' }),
     );
   });
 });

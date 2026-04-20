@@ -8,7 +8,7 @@ vi.mock('../api/userApi', () => ({
   },
 }));
 
-const mockUserApi = vi.mocked(userApi)
+const mockUserApi = vi.mocked(userApi);
 
 describe('userStore', () => {
   afterEach(() => {
@@ -29,8 +29,8 @@ describe('userStore', () => {
     });
 
     it('should start with isLoading false', () => {
-      const { isLoading } = useUserStore.getState()
-      expect(isLoading).toEqual(false)
+      const { isLoading } = useUserStore.getState();
+      expect(isLoading).toEqual(false);
     });
 
     it('should start with null error', () => {
@@ -47,7 +47,7 @@ describe('userStore', () => {
   describe('fetchUser', () => {
     it('should set isLoading to true while fetching', async () => {
       mockUserApi.getDefaultUser.mockImplementation(
-        () => new Promise(() => { }) // Never resolves
+        () => new Promise(() => {}), // Never resolves
       );
 
       await act(async () => {
@@ -90,20 +90,23 @@ describe('userStore', () => {
         updatedAt: '2024-01-01T00:00:00.000Z',
       };
 
-      localStorage.setItem('user-default-field-cache', JSON.stringify({
-        userId: 'default-user',
-        field: {
-          id: 'f1',
-          name: 'Alpha',
-          latitude: null,
-          longitude: null,
-          address: null,
-          isDefault: true,
+      localStorage.setItem(
+        'user-default-field-cache',
+        JSON.stringify({
           userId: 'default-user',
-          createdAt: '2024-01-01T00:00:00.000Z',
-          updatedAt: '2024-01-01T00:00:00.000Z',
-        },
-      }));
+          field: {
+            id: 'f1',
+            name: 'Alpha',
+            latitude: null,
+            longitude: null,
+            address: null,
+            isDefault: true,
+            userId: 'default-user',
+            createdAt: '2024-01-01T00:00:00.000Z',
+            updatedAt: '2024-01-01T00:00:00.000Z',
+          },
+        }),
+      );
 
       mockUserApi.getDefaultUser.mockResolvedValue(mockUser);
 
@@ -117,9 +120,7 @@ describe('userStore', () => {
     });
 
     it('should set error state on failed fetch', async () => {
-      mockUserApi.getDefaultUser.mockRejectedValue(
-        new Error('Failed to fetch')
-      );
+      mockUserApi.getDefaultUser.mockRejectedValue(new Error('Failed to fetch'));
 
       await act(async () => {
         await useUserStore.getState().fetchUser();
@@ -136,7 +137,7 @@ describe('userStore', () => {
       useUserStore.setState({ error: 'Previous error' });
 
       mockUserApi.getDefaultUser.mockImplementation(
-        () => new Promise(() => { }) // Never resolves
+        () => new Promise(() => {}), // Never resolves
       );
 
       await act(async () => {

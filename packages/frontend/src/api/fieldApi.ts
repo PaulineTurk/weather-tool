@@ -4,7 +4,7 @@ export type WeatherDay = {
   precipitationMm: number | null;
   windSpeedMs: number | null;
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
-}
+};
 
 export type FieldWeather = {
   status: 'ok' | 'not_found' | 'unavailable';
@@ -14,7 +14,7 @@ export type FieldWeather = {
     longitude: number;
   } | null;
   days: WeatherDay[];
-}
+};
 
 export type Field = {
   id: string;
@@ -27,14 +27,14 @@ export type Field = {
   createdAt: string;
   updatedAt: string;
   weather?: FieldWeather;
-}
+};
 
 export type FieldPayload = {
   name: string;
   latitude: number | null;
   longitude: number | null;
   address: string | null;
-}
+};
 
 export const fieldApi = {
   async getFieldsForUser(userId: string): Promise<Field[]> {

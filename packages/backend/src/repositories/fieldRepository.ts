@@ -10,14 +10,14 @@ export type Field = {
   userId: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export type FieldPayload = {
   name: string;
   latitude: number | null;
   longitude: number | null;
   address: string | null;
-}
+};
 
 export const fieldRepository = {
   async getFieldsForUser(userId: string): Promise<Field[]> {

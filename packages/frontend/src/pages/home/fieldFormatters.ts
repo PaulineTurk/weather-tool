@@ -18,4 +18,3 @@ export const displayTemperature = (temperatureC: number | null, unit: 'C' | 'F')
 
   return `${temperatureC} °C`;
 };
-

@@ -16,14 +16,18 @@ export function FieldWeatherPanel({ weather, unit, dayCardClassName, emptyClassN
           {weather.days.map((dayWeather) => (
             <article key={dayWeather.date} className={dayCardClassName}>
               <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
-              <p className="text-xs text-gray-600">Temp: {displayTemperature(dayWeather.temperatureC, unit)}</p>
+              <p className="text-xs text-gray-600">
+                Temp: {displayTemperature(dayWeather.temperatureC, unit)}
+              </p>
               <p className="text-xs text-gray-600">
                 Rain: {dayWeather.precipitationMm !== null ? `${dayWeather.precipitationMm} mm` : '-'}
               </p>
               <p className="text-xs text-gray-600">
                 Wind: {dayWeather.windSpeedMs !== null ? `${dayWeather.windSpeedMs} m/s` : '-'}
               </p>
-              <p className="text-xs text-gray-600">Confidence: {confidenceLabel(dayWeather.confidenceLevel)}</p>
+              <p className="text-xs text-gray-600">
+                Confidence: {confidenceLabel(dayWeather.confidenceLevel)}
+              </p>
             </article>
           ))}
         </div>
@@ -31,6 +35,7 @@ export function FieldWeatherPanel({ weather, unit, dayCardClassName, emptyClassN
     );
   }
 
-  return <p className={emptyClassName}>{weather?.message ?? 'Weather forecast unavailable for this field.'}</p>;
+  return (
+    <p className={emptyClassName}>{weather?.message ?? 'Weather forecast unavailable for this field.'}</p>
+  );
 }
-

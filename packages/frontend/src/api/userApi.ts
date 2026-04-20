@@ -5,7 +5,7 @@ export type User = {
   forecastDays: number;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type UserPreferencesPayload = {
   temperatureUnit: 'C' | 'F';

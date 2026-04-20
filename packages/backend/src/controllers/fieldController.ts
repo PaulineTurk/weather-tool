@@ -24,7 +24,7 @@ export const fieldController = {
             days: weather.days.slice(0, forecastDays),
           },
         };
-      })
+      }),
     );
 
     return enriched;
@@ -41,7 +41,7 @@ export const fieldController = {
       const userId = params.data.userId;
       const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -65,7 +65,7 @@ export const fieldController = {
       await fieldRepository.createFieldForUser(userId, payload);
       const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.status(201).json(fields);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -95,7 +95,7 @@ export const fieldController = {
 
       const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -118,7 +118,7 @@ export const fieldController = {
 
       const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },
@@ -150,7 +150,7 @@ export const fieldController = {
 
       const fields = await fieldController.enrichFieldsWithWeather(userId);
       res.json(fields);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   },

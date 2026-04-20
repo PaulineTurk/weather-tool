@@ -19,7 +19,12 @@ const isField = (value: unknown): value is Field => {
   const userId = Reflect.get(value, 'userId');
   const isDefault = Reflect.get(value, 'isDefault');
 
-  return typeof id === 'string' && typeof name === 'string' && typeof userId === 'string' && typeof isDefault === 'boolean';
+  return (
+    typeof id === 'string' &&
+    typeof name === 'string' &&
+    typeof userId === 'string' &&
+    typeof isDefault === 'boolean'
+  );
 };
 
 const isCachedDefaultField = (value: unknown): value is CachedDefaultField => {
@@ -60,7 +65,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Unknown error',
-        isLoading: false
+        isLoading: false,
       });
     }
   },

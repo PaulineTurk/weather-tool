@@ -26,7 +26,7 @@ describe('PreferencesPage', () => {
         <Routes>
           <Route path="/preferences" element={<PreferencesPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(await screen.findByRole('heading', { name: /user preferences/i })).toBeVisible();
@@ -41,10 +41,9 @@ describe('PreferencesPage', () => {
         <Routes>
           <Route path="/preferences" element={<PreferencesPage />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 });
-

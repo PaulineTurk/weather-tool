@@ -47,9 +47,7 @@ describe('userRoutes', () => {
         return Promise.resolve();
       });
 
-      const response = await request(app)
-        .get('/api/users/default')
-        .expect(200);
+      const response = await request(app).get('/api/users/default').expect(200);
 
       expect(response.body).toEqual({
         id: 'default-user',
@@ -65,9 +63,7 @@ describe('userRoutes', () => {
         return Promise.resolve();
       });
 
-      const response = await request(app)
-        .get('/api/users/default')
-        .expect(500);
+      const response = await request(app).get('/api/users/default').expect(500);
 
       expect(response.body).toEqual({ error: 'Internal server error' });
     });

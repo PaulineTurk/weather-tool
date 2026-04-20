@@ -9,7 +9,7 @@ jest.mock('../db', () => ({
   },
 }));
 
-const mockPrisma = jest.mocked(prisma)
+const mockPrisma = jest.mocked(prisma);
 
 describe('userRepository', () => {
   beforeEach(() => {

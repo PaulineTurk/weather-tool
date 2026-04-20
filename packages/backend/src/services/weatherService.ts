@@ -3,7 +3,7 @@ import { Field } from '../repositories/fieldRepository';
 type Coordinates = {
   latitude: number;
   longitude: number;
-}
+};
 
 export type WeatherDay = {
   date: string;
@@ -11,14 +11,14 @@ export type WeatherDay = {
   precipitationMm: number | null;
   windSpeedMs: number | null;
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
-}
+};
 
 export type FieldWeather = {
   status: 'ok' | 'not_found' | 'unavailable';
   message: string | null;
   location: Coordinates | null;
   days: WeatherDay[];
-}
+};
 
 const frogcastBaseUrl = 'https://api.frogcast.com/api/v1/forecast/';
 const geocodeBaseUrl = 'https://nominatim.openstreetmap.org/search';
@@ -92,7 +92,15 @@ const buildDailyWeather = (raw: {
   t2mP10: Array<number | null>;
   t2mP90: Array<number | null>;
 }): WeatherDay[] => {
-  const grouped = new Map<string, { temp: Array<number | null>; rain: Array<number | null>; wind: Array<number | null>; spread: Array<number | null> }>();
+  const grouped = new Map<
+    string,
+    {
+      temp: Array<number | null>;
+      rain: Array<number | null>;
+      wind: Array<number | null>;
+      spread: Array<number | null>;
+    }
+  >();
 
   raw.index.forEach((timestamp, index) => {
     const date = timestamp.slice(0, 10);
@@ -314,7 +322,7 @@ export const weatherService = {
         location: coordinates,
         days,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         status: 'unavailable',
         message: 'Weather service is temporarily unavailable.',
@@ -347,7 +355,7 @@ export const weatherService = {
       }
 
       return weatherService.getWeatherForCoordinates(coordinates);
-    } catch (error) {
+    } catch (_error) {
       return {
         status: 'unavailable',
         message: 'Weather service is temporarily unavailable.',

@@ -2,8 +2,8 @@ import { userApi, User } from './userApi';
 
 describe('userApi', () => {
   afterEach(() => {
-    vi.restoreAllMocks()
-  })
+    vi.restoreAllMocks();
+  });
 
   describe('getDefaultUser', () => {
     it('should return user data when fetch is successful', async () => {
@@ -16,9 +16,9 @@ describe('userApi', () => {
         updatedAt: '2024-01-01T00:00:00.000Z',
       };
 
-      const mockResponse = new Response(JSON.stringify(mockUser))
+      const mockResponse = new Response(JSON.stringify(mockUser));
 
-      vi.spyOn(global, "fetch").mockResolvedValue(mockResponse);
+      vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse);
 
       const result = await userApi.getDefaultUser();
 
@@ -28,23 +28,17 @@ describe('userApi', () => {
     });
 
     it('should throw an error when response is not ok', async () => {
-      const mockResponseWithError = new Response(
-        null,
-        {
-          status: 500,
-        });
+      const mockResponseWithError = new Response(null, {
+        status: 500,
+      });
 
-      vi.spyOn(global, "fetch").mockResolvedValue(mockResponseWithError);
+      vi.spyOn(global, 'fetch').mockResolvedValue(mockResponseWithError);
 
-      await expect(userApi.getDefaultUser()).rejects.toThrow(
-        'Failed to fetch default user'
-      );
+      await expect(userApi.getDefaultUser()).rejects.toThrow('Failed to fetch default user');
     });
 
     it('should throw an error on network failure', async () => {
-      vi.spyOn(global, "fetch").mockRejectedValue(
-        new Error('Network error')
-      );
+      vi.spyOn(global, 'fetch').mockRejectedValue(new Error('Network error'));
 
       await expect(userApi.getDefaultUser()).rejects.toThrow('Network error');
     });
@@ -63,12 +57,15 @@ describe('userApi', () => {
 
       vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify(updatedUser)));
 
-      const result = await userApi.updateUserPreferences('default-user', { temperatureUnit: 'F', forecastDays: 7 });
+      const result = await userApi.updateUserPreferences('default-user', {
+        temperatureUnit: 'F',
+        forecastDays: 7,
+      });
 
       expect(result).toEqual(updatedUser);
       expect(fetch).toHaveBeenCalledWith(
         '/api/users/default-user/preferences',
-        expect.objectContaining({ method: 'PATCH' })
+        expect.objectContaining({ method: 'PATCH' }),
       );
     });
   });

@@ -153,4 +153,3 @@ export function useFields({ userId, getCachedDefaultField, cacheDefaultField }: 
     onToggleDefault,
   };
 }
-

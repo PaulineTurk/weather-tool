@@ -6,9 +6,21 @@
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
     "db:migrate": "pnpm --filter @field-weather/database run migrate",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "lint": "pnpm -r run lint",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.0.0",
+    "prettier": "^3.3.0",
+    "typescript-eslint": "^8.0.0",
     "typescript": "^5.4.0"
   },
   "engines": {

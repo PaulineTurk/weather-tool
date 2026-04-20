@@ -39,7 +39,9 @@ const createApp = () => {
   app.get('/fields/:userId', (req, res) => fieldController.getFieldsForUser(req, res));
   app.post('/fields/:userId', (req, res) => fieldController.createFieldForUser(req, res));
   app.put('/fields/:userId/:fieldId', (req, res) => fieldController.updateFieldForUser(req, res));
-  app.patch('/fields/:userId/:fieldId/default', (req, res) => fieldController.setDefaultFieldForUser(req, res));
+  app.patch('/fields/:userId/:fieldId/default', (req, res) =>
+    fieldController.setDefaultFieldForUser(req, res),
+  );
   app.delete('/fields/:userId/:fieldId', (req, res) => fieldController.deleteFieldForUser(req, res));
   return app;
 };
@@ -204,7 +206,10 @@ describe('fieldController', () => {
     mockFieldRepository.setDefaultFieldForUser.mockResolvedValue(true);
     mockFieldRepository.getFieldsForUser.mockResolvedValue(refreshedFields);
 
-    const response = await request(app).patch('/fields/user-1/f2/default').send({ isDefault: true }).expect(200);
+    const response = await request(app)
+      .patch('/fields/user-1/f2/default')
+      .send({ isDefault: true })
+      .expect(200);
 
     expect(response.body).toEqual([
       expect.objectContaining({
@@ -228,7 +233,10 @@ describe('fieldController', () => {
 
   it('rejects invalid default payload', async () => {
     const app = createApp();
-    const response = await request(app).patch('/fields/user-1/f2/default').send({ isDefault: 'yes' }).expect(400);
+    const response = await request(app)
+      .patch('/fields/user-1/f2/default')
+      .send({ isDefault: 'yes' })
+      .expect(400);
 
     expect(response.body).toEqual({ error: 'Invalid default payload' });
     expect(mockFieldRepository.setDefaultFieldForUser).not.toHaveBeenCalled();

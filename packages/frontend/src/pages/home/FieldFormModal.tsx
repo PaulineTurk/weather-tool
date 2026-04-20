@@ -48,7 +48,10 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
   };
 
   return (
-    <section className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 px-4" aria-label="field form modal">
+    <section
+      className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 px-4"
+      aria-label="field form modal"
+    >
       <form className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg space-y-4" onSubmit={handleSubmit}>
         <h3 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit field' : 'Create field'}</h3>
 
@@ -84,7 +87,9 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
               max={90}
               inputMode="decimal"
               defaultValue={
-                editingField?.latitude !== null && editingField?.latitude !== undefined ? String(editingField.latitude) : ''
+                editingField?.latitude !== null && editingField?.latitude !== undefined
+                  ? String(editingField.latitude)
+                  : ''
               }
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
             />
@@ -100,7 +105,9 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
               max={180}
               inputMode="decimal"
               defaultValue={
-                editingField?.longitude !== null && editingField?.longitude !== undefined ? String(editingField.longitude) : ''
+                editingField?.longitude !== null && editingField?.longitude !== undefined
+                  ? String(editingField.longitude)
+                  : ''
               }
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
             />
@@ -130,4 +137,3 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
     </section>
   );
 }
-
