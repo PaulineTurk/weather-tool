@@ -47,6 +47,7 @@ const extractDefaultField = (currentFields: Field[]): Field | null => {
 export function HomePage() {
   const { user, isLoading, error, fetchUser, cacheDefaultField, getCachedDefaultField } = useUserStore();
   const [fields, setFields] = useState<Field[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [fieldLoadError, setFieldLoadError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingField, setEditingField] = useState<Field | null>(null);
@@ -84,13 +85,23 @@ export function HomePage() {
   const isEditing = editingField !== null;
   const defaultField = useMemo(() => fields.find((field) => field.isDefault) ?? null, [fields]);
 
+  const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery]);
+  const matchesSearch = (field: Field) =>
+    normalizedSearchQuery.length === 0 || field.name.toLocaleLowerCase().includes(normalizedSearchQuery);
+
+  const filteredFields = useMemo(() => fields.filter(matchesSearch), [fields, normalizedSearchQuery]);
+  const filteredDefaultField = useMemo(
+    () => filteredFields.find((field) => field.isDefault) ?? null,
+    [filteredFields]
+  );
+
   const sortedNonDefaultFields = useMemo(() => {
-    return fields
+    return filteredFields
       .filter((field) => !field.isDefault)
       .sort((firstField, secondField) =>
         firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' })
       );
-  }, [fields]);
+  }, [filteredFields]);
 
   const openCreateForm = () => {
     setEditingField(null);
@@ -215,7 +226,21 @@ export function HomePage() {
     <main className="mx-auto space-y-4 pt-20 h-screen overflow-hidden flex flex-col">
       <section className="bg-white rounded-lg shadow-md p-10 space-y-4 flex flex-col flex-1 min-h-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-gray-800">Your fields ({fields.length})</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-xl font-semibold text-gray-800">Your fields ({filteredFields.length}/{fields.length})</h2>
+            <label className="relative">
+              <span className="sr-only">Search fields</span>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                placeholder="Search by field name..."
+                aria-label="Search fields by name"
+                className="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+              />
+            </label>
+          </div>
+
           <button
             type="button"
             className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
@@ -229,24 +254,24 @@ export function HomePage() {
         <div className="rounded-md border border-gray-200 flex flex-col flex-1 min-h-0">
           <div className="p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
             {fieldLoadError ? <p className="text-red-600 text-sm mb-2">{fieldLoadError}</p> : null}
-            {defaultField ? (
+            {filteredDefaultField ? (
               <article className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
                 <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Default field</p>
-                    <p className="font-semibold text-gray-900">{defaultField.name}</p>
-                    {defaultField.address ? <p className="text-gray-600">{defaultField.address}</p> : null}
+                    <p className="font-semibold text-gray-900">{filteredDefaultField.name}</p>
+                    {filteredDefaultField.address ? <p className="text-gray-600">{filteredDefaultField.address}</p> : null}
                     <p className="text-sm text-gray-500">
-                      Lat: {defaultField.latitude ?? '-'} | Lng: {defaultField.longitude ?? '-'}
+                      Lat: {filteredDefaultField.latitude ?? '-'} | Lng: {filteredDefaultField.longitude ?? '-'}
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      aria-label={`Remove ${defaultField.name} as default field`}
+                      aria-label={`Remove ${filteredDefaultField.name} as default field`}
                       title="Unset default field"
                       className="rounded p-1 text-red-500 hover:bg-gray-100 disabled:opacity-60"
-                      onClick={() => onToggleDefault(defaultField.id, true)}
+                      onClick={() => onToggleDefault(filteredDefaultField.id, true)}
                       disabled={isSubmitting}
                     >
                       <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -256,7 +281,7 @@ export function HomePage() {
                     <button
                       type="button"
                       className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => openEditForm(defaultField.id)}
+                      onClick={() => openEditForm(filteredDefaultField.id)}
                       disabled={isSubmitting}
                     >
                       Edit
@@ -264,7 +289,7 @@ export function HomePage() {
                     <button
                       type="button"
                       className="rounded border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50"
-                      onClick={() => onDelete(defaultField.id)}
+                      onClick={() => onDelete(filteredDefaultField.id)}
                       disabled={isSubmitting}
                     >
                       Delete
@@ -272,10 +297,10 @@ export function HomePage() {
                   </div>
                 </div>
                 <div className="mt-3 border-t border-blue-100 pt-3">
-                  {defaultField.weather?.status === 'ok' && defaultField.weather.days.length > 0 ? (
+                  {filteredDefaultField.weather?.status === 'ok' && filteredDefaultField.weather.days.length > 0 ? (
                     <div className="overflow-x-auto">
                       <div className="flex min-w-max gap-2">
-                        {defaultField.weather.days.map((dayWeather) => (
+                        {filteredDefaultField.weather.days.map((dayWeather) => (
                           <article
                             key={dayWeather.date}
                             className="w-44 shrink-0 rounded-md border border-blue-200 bg-white p-2"
@@ -299,7 +324,7 @@ export function HomePage() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500">
-                      {defaultField.weather?.message ?? 'Weather forecast unavailable for this field.'}
+                      {filteredDefaultField.weather?.message ?? 'Weather forecast unavailable for this field.'}
                     </p>
                   )}
                 </div>

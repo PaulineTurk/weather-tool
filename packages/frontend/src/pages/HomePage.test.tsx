@@ -242,7 +242,54 @@ describe('HomePage', () => {
     expect(await screen.findByText('Default field')).toBeVisible();
     expect(screen.getByRole('button', { name: /remove alpha as default field/i })).toBeVisible();
     expect(fieldApi.setFieldDefault).toHaveBeenCalledWith('1', 'f1', true);
-    expect(screen.getByRole('heading', { name: /your fields \(2\)/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /your fields \(2\/2\)/i })).toBeVisible();
+  });
+
+  it('filters fields by name from the search bar', async () => {
+    vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
+      id: '1',
+      name: 'Test User',
+      temperatureUnit: 'C',
+      forecastDays: 1,
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01',
+    });
+
+    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+      {
+        id: 'f1',
+        name: 'Alpha',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+      {
+        id: 'f2',
+        name: 'Beta',
+        latitude: null,
+        longitude: null,
+        address: null,
+        isDefault: false,
+        userId: '1',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01',
+      },
+    ]);
+
+    render(<HomePage />);
+
+    expect(await screen.findByText('Alpha')).toBeVisible();
+    expect(screen.getByText('Beta')).toBeVisible();
+
+    const user = userEvent.setup();
+    await user.type(screen.getByRole('searchbox', { name: /search fields by name/i }), 'be');
+
+    expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
+    expect(screen.getByText('Beta')).toBeVisible();
   });
 
   it('allows editing and deleting the default field', async () => {
