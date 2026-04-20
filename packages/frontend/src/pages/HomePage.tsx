@@ -48,6 +48,7 @@ export function HomePage() {
   const { user, isLoading, error, fetchUser, cacheDefaultField, getCachedDefaultField } = useUserStore();
   const [fields, setFields] = useState<Field[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [areFieldsLoading, setAreFieldsLoading] = useState(false);
   const [fieldLoadError, setFieldLoadError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingField, setEditingField] = useState<Field | null>(null);
@@ -64,6 +65,7 @@ export function HomePage() {
         return;
       }
 
+      setAreFieldsLoading(true);
       try {
         setFieldLoadError(null);
         const cachedDefaultField = getCachedDefaultField(user.id);
@@ -76,6 +78,8 @@ export function HomePage() {
         cacheDefaultField(user.id, extractDefaultField(fetchedFields));
       } catch (loadError) {
         setFieldLoadError(loadError instanceof Error ? loadError.message : 'Unknown error');
+      } finally {
+        setAreFieldsLoading(false);
       }
     };
 
@@ -330,7 +334,11 @@ export function HomePage() {
                 </div>
               </article>
             ) : null}
-            {sortedNonDefaultFields.length === 0 ? (
+            {areFieldsLoading ? (
+              <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            ) : sortedNonDefaultFields.length === 0 ? (
               <p className="text-gray-600">
                 {defaultField ? 'No other fields yet.' : 'No fields yet. Add your first one.'}
               </p>
