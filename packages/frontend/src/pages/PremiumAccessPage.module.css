@@ -1,0 +1,84 @@
+.scene {
+  position: relative;
+  height: 360px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #0f172a; /* slate-900 */
+}
+
+.fieldLines {
+  position: absolute;
+  inset: auto -20% 0 -20%;
+  height: 55%;
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(15, 23, 42, 0.08) 0px,
+      rgba(15, 23, 42, 0.08) 2px,
+      transparent 2px,
+      transparent 18px
+    );
+  transform: skewY(-6deg);
+  animation: fieldScroll 2.6s linear infinite;
+}
+
+.tractorWrap {
+  position: absolute;
+  left: -45%;
+  bottom: 22%;
+  width: 420px;
+  animation: tractorMove 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 14px 28px rgba(2, 6, 23, 0.08));
+}
+
+.tractorSvg {
+  width: 100%;
+  height: auto;
+}
+
+.wheelBig {
+  transform-origin: 265px 118px;
+  animation: wheelSpin 0.9s linear infinite;
+}
+
+.wheelSmall {
+  transform-origin: 335px 118px;
+  animation: wheelSpin 0.9s linear infinite;
+}
+
+@keyframes tractorMove {
+  0% {
+    transform: translateX(0);
+  }
+  55% {
+    transform: translateX(110%);
+  }
+  100% {
+    transform: translateX(240%);
+  }
+}
+
+@keyframes wheelSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fieldScroll {
+  to {
+    background-position: 180px 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .scene {
+    height: 240px;
+  }
+
+  .tractorWrap {
+    width: 340px;
+    bottom: 20%;
+  }
+}
+

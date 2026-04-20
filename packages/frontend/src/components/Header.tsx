@@ -16,13 +16,24 @@ export function Header() {
         <span className="text-lg font-bold text-gray-700">Welcome {user.name}</span>
       </div>
 
-      <button
-        type="button"
-        onClick={() => navigate('/preferences')}
-        className="flex flex-col items-center gap-1 rounded-md px-3 py-2 hover:bg-gray-100"
-      >
-        <img className="h-8 w-8" src="/assets/gear.png" />
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => navigate('/premium-access')}
+          className="rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+        >
+          Premium access
+        </button>
+
+        <button
+          type="button"
+          aria-label="Open preferences"
+          onClick={() => navigate('/preferences')}
+          className="flex flex-col items-center gap-1 rounded-md px-3 py-2 hover:bg-gray-100"
+        >
+          <img className="h-8 w-8" src="/assets/gear.png" alt="" />
+        </button>
+      </div>
     </header>
   );
 }
