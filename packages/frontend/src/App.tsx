@@ -29,8 +29,8 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      {user ? <Header user={user} onOpenPreferences={() => navigateTo('/preferences')} /> : null}
+    <div className="min-h-screen bg-gray-100">
+      {user ? <Header user={user} onOpenAppLogo={() => navigateTo('/')} onOpenPreferences={() => navigateTo('/preferences')} /> : null}
       {route === '/preferences' ? <PreferencesPage onBackHome={() => navigateTo('/')} /> : <HomePage />}
     </div>
   );

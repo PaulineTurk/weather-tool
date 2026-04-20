@@ -44,8 +44,8 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl">
-      <section className="rounded-lg bg-white p-6 shadow-md">
+    <main className="mx-auto max-w-3xl pt-24 pb-4 px-4 h-screen overflow-hidden flex flex-col">
+      <section className="rounded-lg bg-white p-10 shadow-md flex-1 flex flex-col">
         <h1 className="text-xl font-semibold text-gray-800">User preferences</h1>
         <p className="mt-1 text-sm text-gray-600">Configure how weather data is displayed.</p>
 
@@ -63,9 +63,8 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
                   onChange={() => setTemperatureUnit('C')}
                 />
                 <span
-                  className={`block rounded px-4 py-2 text-sm ${
-                    temperatureUnit === 'C' ? 'bg-blue-600 text-white' : 'text-gray-700'
-                  }`}
+                  className={`block rounded px-4 py-2 text-sm ${temperatureUnit === 'C' ? 'bg-green-600 text-white' : 'text-gray-700'
+                    }`}
                 >
                   °C
                 </span>
@@ -80,9 +79,8 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
                   onChange={() => setTemperatureUnit('F')}
                 />
                 <span
-                  className={`block rounded px-4 py-2 text-sm ${
-                    temperatureUnit === 'F' ? 'bg-blue-600 text-white' : 'text-gray-700'
-                  }`}
+                  className={`block rounded px-4 py-2 text-sm ${temperatureUnit === 'F' ? 'bg-green-600 text-white' : 'text-gray-700'
+                    }`}
                 >
                   °F
                 </span>
@@ -118,7 +116,7 @@ export function PreferencesPage({ onBackHome }: PreferencesPageProps) {
             </button>
             <button
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+              className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
               disabled={isSubmitting}
             >
               Save preferences

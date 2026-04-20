@@ -212,13 +212,13 @@ export function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl space-y-4">
-      <section className="bg-white rounded-lg shadow-md p-6 space-y-4">
+    <main className="mx-auto space-y-4 pt-20 h-screen overflow-hidden flex flex-col">
+      <section className="bg-white rounded-lg shadow-md p-10 space-y-4 flex flex-col flex-1 min-h-0">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-xl font-semibold text-gray-800">Your fields ({fields.length})</h2>
           <button
             type="button"
-            className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+            className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
             onClick={openCreateForm}
             disabled={isSubmitting}
           >
@@ -226,14 +226,14 @@ export function HomePage() {
           </button>
         </div>
 
-        <div className="rounded-md border border-gray-200">
-          <div className="p-4">
+        <div className="rounded-md border border-gray-200 flex flex-col flex-1 min-h-0">
+          <div className="p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
             {fieldLoadError ? <p className="text-red-600 text-sm mb-2">{fieldLoadError}</p> : null}
             {defaultField ? (
               <article className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
                 <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Default field</p>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Default field</p>
                     <p className="font-semibold text-gray-900">{defaultField.name}</p>
                     {defaultField.address ? <p className="text-gray-600">{defaultField.address}</p> : null}
                     <p className="text-sm text-gray-500">
@@ -310,7 +310,7 @@ export function HomePage() {
                 {defaultField ? 'No other fields yet.' : 'No fields yet. Add your first one.'}
               </p>
             ) : (
-              <ul className="max-h-80 overflow-y-auto space-y-3 pr-1">
+              <ul className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-0">
                 {sortedNonDefaultFields.map((field) => (
                   <li key={field.id} className="rounded-md border border-gray-200 p-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -468,7 +468,7 @@ export function HomePage() {
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+                className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-60"
                 disabled={isSubmitting}
               >
                 {isEditing ? 'Save changes' : 'Create field'}

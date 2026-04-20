@@ -8,7 +8,7 @@ async function main() {
     update: {},
     create: {
       id: 'default-user',
-      name: 'Default Agent',
+      name: 'John Doe',
     },
   });
 
