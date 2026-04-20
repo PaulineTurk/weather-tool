@@ -65,8 +65,8 @@ export function PreferencesPage() {
   };
 
   return (
-    <main className="mx-auto max-w-3xl pt-24 pb-4 px-4 h-screen overflow-hidden flex flex-col">
-      <section className="rounded-lg bg-white p-10 shadow-md flex-1 flex flex-col">
+    <main className="mx-auto flex h-screen max-w-3xl flex-col overflow-hidden px-3 pt-24 pb-3 sm:px-4">
+      <section className="flex flex-1 flex-col rounded-lg bg-white p-4 shadow-md sm:p-6 lg:p-10">
         <h1 className="text-xl font-semibold text-gray-800">User preferences</h1>
         <p className="mt-1 text-sm text-gray-600">Configure how weather data is displayed.</p>
 
@@ -128,10 +128,10 @@ export function PreferencesPage() {
 
           {formError ? <p className="text-sm text-red-600">{formError}</p> : null}
 
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
             <button
               type="button"
-              className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100"
+              className="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-100 sm:w-auto"
               onClick={() => navigate('/')}
               disabled={isSubmitting}
             >
@@ -139,7 +139,7 @@ export function PreferencesPage() {
             </button>
             <button
               type="submit"
-              className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60"
+              className="w-full rounded-md bg-green-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-60 sm:w-auto"
               disabled={isSubmitting}
             >
               Save preferences

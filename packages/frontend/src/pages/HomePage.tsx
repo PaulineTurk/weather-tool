@@ -69,14 +69,14 @@ export function HomePage() {
   }
 
   return (
-    <main className="mx-auto space-y-4 pt-20 h-screen overflow-hidden flex flex-col">
-      <section className="bg-white rounded-lg shadow-md p-10 space-y-4 flex flex-col flex-1 min-h-0">
+    <main className="mx-auto flex h-screen flex-col space-y-4 overflow-hidden px-3 pt-20 pb-3 sm:px-4">
+      <section className="flex min-h-0 flex-1 flex-col space-y-4 rounded-lg bg-white p-4 shadow-md sm:p-6 lg:p-10">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
             <h2 className="text-xl font-semibold text-gray-800">
               Your plots ({filteredPlots.length}/{plots.length})
             </h2>
-            <label className="relative">
+            <label className="relative w-full sm:w-auto">
               <span className="sr-only">Search plots</span>
               <input
                 type="search"
@@ -84,7 +84,7 @@ export function HomePage() {
                 onChange={(event) => setSearchQuery(event.currentTarget.value)}
                 placeholder="Search by plot name..."
                 aria-label="Search plots by name"
-                className="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 sm:w-64"
               />
             </label>
           </div>
@@ -118,7 +118,7 @@ export function HomePage() {
                       {filteredDefaultPlot.longitude ?? '-'}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
                       aria-label={`Remove ${filteredDefaultPlot.name} as default plot`}
@@ -180,7 +180,7 @@ export function HomePage() {
                         </p>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
                           aria-label={`Set ${plot.name} as default plot`}
