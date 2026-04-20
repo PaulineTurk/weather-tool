@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useUserStore } from '../store/userStore';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { FieldFormModal } from './home/FieldFormModal';
-import { FieldWeatherPanel } from './home/FieldWeatherPanel';
-import { useFields } from './home/useFields';
+import { PlotFormModal } from './home/PlotFormModal';
+import { PlotWeatherPanel } from './home/PlotWeatherPanel';
+import { usePlots } from './home/usePlots';
 
 export function HomePage() {
-  const { user, isLoading, error, fetchUser, cacheDefaultField, getCachedDefaultField } = useUserStore();
+  const { user, isLoading, error, fetchUser, cacheDefaultPlot, getCachedDefaultPlot } = useUserStore();
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -15,12 +15,12 @@ export function HomePage() {
   }, [fetchUser]);
 
   const {
-    fields,
-    defaultField,
-    areFieldsLoading,
-    fieldLoadError,
+    plots,
+    defaultPlot,
+    arePlotsLoading,
+    plotLoadError,
     isFormOpen,
-    editingField,
+    editingPlot,
     formError,
     isSubmitting,
     openCreateForm,
@@ -29,32 +29,32 @@ export function HomePage() {
     createOrUpdate,
     onDelete,
     onToggleDefault,
-  } = useFields({
+  } = usePlots({
     userId: user?.id ?? null,
-    cacheDefaultField,
-    getCachedDefaultField,
+    cacheDefaultPlot,
+    getCachedDefaultPlot,
   });
 
   const normalizedSearchQuery = useMemo(() => searchQuery.trim().toLocaleLowerCase(), [searchQuery]);
-  const filteredFields = useMemo(() => {
+  const filteredPlots = useMemo(() => {
     if (normalizedSearchQuery.length === 0) {
-      return fields;
+      return plots;
     }
 
-    return fields.filter((field) => field.name.toLocaleLowerCase().includes(normalizedSearchQuery));
-  }, [fields, normalizedSearchQuery]);
-  const filteredDefaultField = useMemo(
-    () => filteredFields.find((field) => field.isDefault) ?? null,
-    [filteredFields],
+    return plots.filter((plot) => plot.name.toLocaleLowerCase().includes(normalizedSearchQuery));
+  }, [plots, normalizedSearchQuery]);
+  const filteredDefaultPlot = useMemo(
+    () => filteredPlots.find((plot) => plot.isDefault) ?? null,
+    [filteredPlots],
   );
 
-  const sortedNonDefaultFields = useMemo(() => {
-    return filteredFields
-      .filter((field) => !field.isDefault)
-      .sort((firstField, secondField) =>
-        firstField.name.localeCompare(secondField.name, undefined, { sensitivity: 'base' }),
+  const sortedNonDefaultPlots = useMemo(() => {
+    return filteredPlots
+      .filter((plot) => !plot.isDefault)
+      .sort((firstPlot, secondPlot) =>
+        firstPlot.name.localeCompare(secondPlot.name, undefined, { sensitivity: 'base' }),
       );
-  }, [filteredFields]);
+  }, [filteredPlots]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -74,16 +74,16 @@ export function HomePage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
             <h2 className="text-xl font-semibold text-gray-800">
-              Your fields ({filteredFields.length}/{fields.length})
+              Your plots ({filteredPlots.length}/{plots.length})
             </h2>
             <label className="relative">
-              <span className="sr-only">Search fields</span>
+              <span className="sr-only">Search plots</span>
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.currentTarget.value)}
-                placeholder="Search by field name..."
-                aria-label="Search fields by name"
+                placeholder="Search by plot name..."
+                aria-label="Search plots by name"
                 className="w-64 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400"
               />
             </label>
@@ -95,36 +95,36 @@ export function HomePage() {
             onClick={openCreateForm}
             disabled={isSubmitting}
           >
-            Add field
+            Add plot
           </button>
         </div>
 
         <div className="rounded-md border border-gray-200 flex flex-col flex-1 min-h-0">
           <div className="p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
-            {fieldLoadError ? <p className="text-red-600 text-sm mb-2">{fieldLoadError}</p> : null}
-            {filteredDefaultField ? (
+            {plotLoadError ? <p className="text-red-600 text-sm mb-2">{plotLoadError}</p> : null}
+            {filteredDefaultPlot ? (
               <article className="mb-4 rounded-md border border-blue-200 bg-blue-50 p-3">
                 <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
-                      Default field
+                      Default plot
                     </p>
-                    <p className="font-semibold text-gray-900">{filteredDefaultField.name}</p>
-                    {filteredDefaultField.address ? (
-                      <p className="text-gray-600">{filteredDefaultField.address}</p>
+                    <p className="font-semibold text-gray-900">{filteredDefaultPlot.name}</p>
+                    {filteredDefaultPlot.address ? (
+                      <p className="text-gray-600">{filteredDefaultPlot.address}</p>
                     ) : null}
                     <p className="text-sm text-gray-500">
-                      Lat: {filteredDefaultField.latitude ?? '-'} | Lng:{' '}
-                      {filteredDefaultField.longitude ?? '-'}
+                      Lat: {filteredDefaultPlot.latitude ?? '-'} | Lng:{' '}
+                      {filteredDefaultPlot.longitude ?? '-'}
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      aria-label={`Remove ${filteredDefaultField.name} as default field`}
-                      title="Unset default field"
+                      aria-label={`Remove ${filteredDefaultPlot.name} as default plot`}
+                      title="Unset default plot"
                       className="rounded p-1 text-red-500 hover:bg-gray-100 disabled:opacity-60"
-                      onClick={() => onToggleDefault(filteredDefaultField.id, true)}
+                      onClick={() => onToggleDefault(filteredDefaultPlot.id, true)}
                       disabled={isSubmitting}
                     >
                       <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -134,7 +134,7 @@ export function HomePage() {
                     <button
                       type="button"
                       className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => openEditForm(filteredDefaultField.id)}
+                      onClick={() => openEditForm(filteredDefaultPlot.id)}
                       disabled={isSubmitting}
                     >
                       Edit
@@ -142,7 +142,7 @@ export function HomePage() {
                     <button
                       type="button"
                       className="rounded border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50"
-                      onClick={() => onDelete(filteredDefaultField.id)}
+                      onClick={() => onDelete(filteredDefaultPlot.id)}
                       disabled={isSubmitting}
                     >
                       Delete
@@ -150,8 +150,8 @@ export function HomePage() {
                   </div>
                 </div>
                 <div className="mt-3 border-t border-blue-100 pt-3">
-                  <FieldWeatherPanel
-                    weather={filteredDefaultField.weather}
+                  <PlotWeatherPanel
+                    weather={filteredDefaultPlot.weather}
                     unit={user.temperatureUnit}
                     dayCardClassName="w-44 shrink-0 rounded-md border border-blue-200 bg-white p-2"
                     emptyClassName="text-sm text-gray-500"
@@ -159,34 +159,34 @@ export function HomePage() {
                 </div>
               </article>
             ) : null}
-            {areFieldsLoading ? (
+            {arePlotsLoading ? (
               <div className="flex-1 min-h-0 overflow-y-auto flex items-center justify-center">
                 <LoadingSpinner />
               </div>
-            ) : sortedNonDefaultFields.length === 0 ? (
+            ) : sortedNonDefaultPlots.length === 0 ? (
               <p className="text-gray-600">
-                {defaultField ? 'No other fields yet.' : 'No fields yet. Add your first one.'}
+                {defaultPlot ? 'No other plots yet.' : 'No plots yet. Add your first one.'}
               </p>
             ) : (
               <ul className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-0">
-                {sortedNonDefaultFields.map((field) => (
-                  <li key={field.id} className="rounded-md border border-gray-200 p-3">
+                {sortedNonDefaultPlots.map((plot) => (
+                  <li key={plot.id} className="rounded-md border border-gray-200 p-3">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="space-y-1">
-                        <p className="font-semibold text-gray-900">{field.name}</p>
-                        {field.address ? <p className="text-gray-600">{field.address}</p> : null}
+                        <p className="font-semibold text-gray-900">{plot.name}</p>
+                        {plot.address ? <p className="text-gray-600">{plot.address}</p> : null}
                         <p className="text-sm text-gray-500">
-                          Lat: {field.latitude ?? '-'} | Lng: {field.longitude ?? '-'}
+                          Lat: {plot.latitude ?? '-'} | Lng: {plot.longitude ?? '-'}
                         </p>
                       </div>
 
                       <div className="flex gap-2">
                         <button
                           type="button"
-                          aria-label={`Set ${field.name} as default field`}
-                          title="Set as default field"
+                          aria-label={`Set ${plot.name} as default plot`}
+                          title="Set as default plot"
                           className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-red-500 disabled:opacity-60"
-                          onClick={() => onToggleDefault(field.id, false)}
+                          onClick={() => onToggleDefault(plot.id, false)}
                           disabled={isSubmitting}
                         >
                           <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
@@ -196,7 +196,7 @@ export function HomePage() {
                         <button
                           type="button"
                           className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => openEditForm(field.id)}
+                          onClick={() => openEditForm(plot.id)}
                           disabled={isSubmitting}
                         >
                           Edit
@@ -204,7 +204,7 @@ export function HomePage() {
                         <button
                           type="button"
                           className="rounded border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50"
-                          onClick={() => onDelete(field.id)}
+                          onClick={() => onDelete(plot.id)}
                           disabled={isSubmitting}
                         >
                           Delete
@@ -213,8 +213,8 @@ export function HomePage() {
                     </div>
 
                     <div className="mt-3 border-t border-gray-100 pt-3">
-                      <FieldWeatherPanel
-                        weather={field.weather}
+                      <PlotWeatherPanel
+                        weather={plot.weather}
                         unit={user.temperatureUnit}
                         dayCardClassName="w-44 shrink-0 rounded-md border border-gray-200 bg-gray-50 p-2"
                         emptyClassName="text-sm text-gray-500"
@@ -228,9 +228,9 @@ export function HomePage() {
         </div>
       </section>
 
-      <FieldFormModal
+      <PlotFormModal
         isOpen={isFormOpen}
-        editingField={editingField}
+        editingPlot={editingPlot}
         isSubmitting={isSubmitting}
         error={formError}
         onClose={closeForm}

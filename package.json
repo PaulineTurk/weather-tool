@@ -1,11 +1,11 @@
 {
-  "name": "field-weather-dashboard",
+  "name": "plot-weather-dashboard",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
-    "db:migrate": "pnpm --filter @field-weather/database run migrate",
+    "db:migrate": "pnpm --filter @plot-weather/database run migrate",
     "test": "pnpm -r test",
     "lint": "pnpm -r run lint",
     "format": "prettier . --write",

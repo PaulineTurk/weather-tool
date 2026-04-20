@@ -1,4 +1,4 @@
-import { Field } from '../repositories/fieldRepository';
+import { Plot } from '../repositories/plotRepository';
 
 type Coordinates = {
   latitude: number;
@@ -13,7 +13,7 @@ export type WeatherDay = {
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
 };
 
-export type FieldWeather = {
+export type PlotWeather = {
   status: 'ok' | 'not_found' | 'unavailable';
   message: string | null;
   location: Coordinates | null;
@@ -176,19 +176,19 @@ const geocodeAddress = async (address: string): Promise<Coordinates | null> => {
   return { latitude, longitude };
 };
 
-const resolveCoordinates = async (field: Field): Promise<Coordinates | null> => {
-  if (field.address) {
-    const fromAddress = await geocodeAddress(field.address);
+const resolveCoordinates = async (plot: Plot): Promise<Coordinates | null> => {
+  if (plot.address) {
+    const fromAddress = await geocodeAddress(plot.address);
     if (fromAddress) {
       return fromAddress;
     }
   }
 
-  if (field.latitude !== null && field.longitude !== null) {
-    const isLatitudeValid = field.latitude >= -90 && field.latitude <= 90;
-    const isLongitudeValid = field.longitude >= -180 && field.longitude <= 180;
+  if (plot.latitude !== null && plot.longitude !== null) {
+    const isLatitudeValid = plot.latitude >= -90 && plot.latitude <= 90;
+    const isLongitudeValid = plot.longitude >= -180 && plot.longitude <= 180;
     if (isLatitudeValid && isLongitudeValid) {
-      return { latitude: field.latitude, longitude: field.longitude };
+      return { latitude: plot.latitude, longitude: plot.longitude };
     }
   }
 
@@ -283,7 +283,7 @@ const fetchFrogcastWeather = async (coordinates: Coordinates): Promise<WeatherDa
 };
 
 export const weatherService = {
-  async getWeatherForCoordinates(coordinates: Coordinates): Promise<FieldWeather> {
+  async getWeatherForCoordinates(coordinates: Coordinates): Promise<PlotWeather> {
     try {
       if (!isConfigured()) {
         return {
@@ -332,7 +332,7 @@ export const weatherService = {
     }
   },
 
-  async getWeatherForField(field: Field): Promise<FieldWeather> {
+  async getWeatherForPlot(plot: Plot): Promise<PlotWeather> {
     try {
       if (!isConfigured()) {
         return {
@@ -343,12 +343,12 @@ export const weatherService = {
         };
       }
 
-      const coordinates = await resolveCoordinates(field);
+      const coordinates = await resolveCoordinates(plot);
 
       if (!coordinates) {
         return {
           status: 'not_found',
-          message: 'No usable address or coordinates for this field.',
+          message: 'No usable address or coordinates for this plot.',
           location: null,
           days: [],
         };

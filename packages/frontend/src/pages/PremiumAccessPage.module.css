@@ -7,7 +7,7 @@
   color: #0f172a; /* slate-900 */
 }
 
-.fieldLines {
+.plotLines {
   position: absolute;
   inset: auto -20% 0 -20%;
   height: 55%;
@@ -20,7 +20,7 @@
       transparent 18px
     );
   transform: skewY(-6deg);
-  animation: fieldScroll 2.6s linear infinite;
+  animation: plotScroll 2.6s linear infinite;
 }
 
 .tractorWrap {
@@ -65,7 +65,7 @@
   }
 }
 
-@keyframes fieldScroll {
+@keyframes plotScroll {
   to {
     background-position: 180px 0;
   }

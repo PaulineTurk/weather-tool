@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import userRoutes from './routes/userRoutes';
-import fieldRoutes from './routes/fieldRoutes';
+import plotRoutes from './routes/plotRoutes';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFilePath);
@@ -22,7 +22,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/users', userRoutes);
-app.use('/api/fields', fieldRoutes);
+app.use('/api/plots', plotRoutes);
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);

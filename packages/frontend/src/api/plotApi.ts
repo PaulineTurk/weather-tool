@@ -6,7 +6,7 @@ export type WeatherDay = {
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
 };
 
-export type FieldWeather = {
+export type PlotWeather = {
   status: 'ok' | 'not_found' | 'unavailable';
   message: string | null;
   location: {
@@ -16,7 +16,7 @@ export type FieldWeather = {
   days: WeatherDay[];
 };
 
-export type Field = {
+export type Plot = {
   id: string;
   name: string;
   latitude: number | null;
@@ -26,76 +26,76 @@ export type Field = {
   userId: string;
   createdAt: string;
   updatedAt: string;
-  weather?: FieldWeather;
+  weather?: PlotWeather;
 };
 
-export type FieldPayload = {
+export type PlotPayload = {
   name: string;
   latitude: number | null;
   longitude: number | null;
   address: string | null;
 };
 
-export const fieldApi = {
-  async getFieldsForUser(userId: string): Promise<Field[]> {
-    const response = await fetch(`/api/fields/users/${userId}`);
+export const plotApi = {
+  async getPlotsForUser(userId: string): Promise<Plot[]> {
+    const response = await fetch(`/api/plots/users/${userId}`);
 
     if (!response.ok) {
-      throw new Error('Failed to fetch fields');
+      throw new Error('Failed to fetch plots');
     }
 
     return response.json();
   },
 
-  async createField(userId: string, payload: FieldPayload): Promise<Field[]> {
-    const response = await fetch(`/api/fields/users/${userId}`, {
+  async createPlot(userId: string, payload: PlotPayload): Promise<Plot[]> {
+    const response = await fetch(`/api/plots/users/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create field');
+      throw new Error('Failed to create plot');
     }
 
     return response.json();
   },
 
-  async updateField(userId: string, fieldId: string, payload: FieldPayload): Promise<Field[]> {
-    const response = await fetch(`/api/fields/users/${userId}/${fieldId}`, {
+  async updatePlot(userId: string, plotId: string, payload: PlotPayload): Promise<Plot[]> {
+    const response = await fetch(`/api/plots/users/${userId}/${plotId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update field');
+      throw new Error('Failed to update plot');
     }
 
     return response.json();
   },
 
-  async deleteField(userId: string, fieldId: string): Promise<Field[]> {
-    const response = await fetch(`/api/fields/users/${userId}/${fieldId}`, {
+  async deletePlot(userId: string, plotId: string): Promise<Plot[]> {
+    const response = await fetch(`/api/plots/users/${userId}/${plotId}`, {
       method: 'DELETE',
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete field');
+      throw new Error('Failed to delete plot');
     }
 
     return response.json();
   },
 
-  async setFieldDefault(userId: string, fieldId: string, isDefault: boolean): Promise<Field[]> {
-    const response = await fetch(`/api/fields/users/${userId}/${fieldId}/default`, {
+  async setPlotDefault(userId: string, plotId: string, isDefault: boolean): Promise<Plot[]> {
+    const response = await fetch(`/api/plots/users/${userId}/${plotId}/default`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ isDefault }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to update default field');
+      throw new Error('Failed to update default plot');
     }
 
     return response.json();

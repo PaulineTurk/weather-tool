@@ -1,5 +1,5 @@
 {
-  "name": "@field-weather/frontend",
+  "name": "@plot-weather/frontend",
   "version": "1.0.0",
   "private": true,
   "type": "module",

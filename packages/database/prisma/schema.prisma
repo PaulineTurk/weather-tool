@@ -14,10 +14,10 @@ model User {
   forecastDays    Int      @default(1)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  fields          Field[]
+  plots           Plot[]
 }
 
-model Field {
+model Plot {
   id        String   @id @default(cuid())
   name      String
   latitude  Float?

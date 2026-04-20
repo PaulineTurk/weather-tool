@@ -28,7 +28,7 @@ export function PremiumAccessPage() {
 
           <div className="relative bg-gradient-to-b from-gray-50 to-white">
             <div className={styles.scene} aria-hidden="true">
-              <div className={styles.fieldLines} />
+              <div className={styles.plotLines} />
               <div className={styles.tractorWrap}>
                 <svg className={styles.tractorSvg} viewBox="0 0 420 160" fill="none" xmlns="http://www.w3.org/2000/svg">
                   {/* ground */}

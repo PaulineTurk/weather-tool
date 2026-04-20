@@ -1,4 +1,4 @@
-import type { WeatherDay } from '../../api/fieldApi';
+import type { WeatherDay } from '../../api/plotApi';
 
 export const confidenceLabel = (level: WeatherDay['confidenceLevel']): string => {
   if (level === 'high') return 'High';

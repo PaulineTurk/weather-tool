@@ -1,5 +1,5 @@
 {
-  "name": "@field-weather/backend",
+  "name": "@plot-weather/backend",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -12,7 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@field-weather/database": "workspace:*",
+    "@plot-weather/database": "workspace:*",
     "@prisma/client": "^5.12.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

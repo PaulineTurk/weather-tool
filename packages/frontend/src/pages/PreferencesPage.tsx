@@ -7,7 +7,7 @@ import { ErrorMessage } from '../components/ErrorMessage';
 
 export function PreferencesPage() {
   const navigate = useNavigate();
-  const { user, setUser, cacheDefaultField, isLoading, error, fetchUser } = useUserStore();
+  const { user, setUser, cacheDefaultPlot, isLoading, error, fetchUser } = useUserStore();
   const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>(user?.temperatureUnit ?? 'C');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function PreferencesPage() {
         forecastDays,
       });
       setUser(updatedUser);
-      cacheDefaultField(user.id, null);
+      cacheDefaultPlot(user.id, null);
       navigate('/');
     } catch (submitError) {
       setFormError(submitError instanceof Error ? submitError.message : 'Unknown error');

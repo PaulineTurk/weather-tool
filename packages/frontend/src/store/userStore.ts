@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 import { User, userApi } from '../api/userApi';
-import { Field } from '../api/fieldApi';
+import { Plot } from '../api/plotApi';
 
-const defaultFieldCacheKey = 'user-default-field-cache';
+const defaultPlotCacheKey = 'user-default-plot-cache';
 
-type CachedDefaultField = {
+type CachedDefaultPlot = {
   userId: string;
-  field: Field;
+  plot: Plot;
 };
 
-const isField = (value: unknown): value is Field => {
+const isPlot = (value: unknown): value is Plot => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -27,31 +27,31 @@ const isField = (value: unknown): value is Field => {
   );
 };
 
-const isCachedDefaultField = (value: unknown): value is CachedDefaultField => {
+const isCachedDefaultPlot = (value: unknown): value is CachedDefaultPlot => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
 
   const userId = Reflect.get(value, 'userId');
-  const field = Reflect.get(value, 'field');
+  const plot = Reflect.get(value, 'plot');
 
-  return typeof userId === 'string' && isField(field);
+  return typeof userId === 'string' && isPlot(plot);
 };
 
 type UserState = {
   user: User | null;
-  defaultField: Field | null;
+  defaultPlot: Plot | null;
   isLoading: boolean;
   error: string | null;
   fetchUser: () => Promise<void>;
   setUser: (user: User) => void;
-  getCachedDefaultField: (userId: string) => Field | null;
-  cacheDefaultField: (userId: string, field: Field | null) => void;
+  getCachedDefaultPlot: (userId: string) => Plot | null;
+  cacheDefaultPlot: (userId: string, plot: Plot | null) => void;
 };
 
 export const useUserStore = create<UserState>((set, get) => ({
   user: null,
-  defaultField: null,
+  defaultPlot: null,
   isLoading: false,
   error: null,
 
@@ -60,8 +60,8 @@ export const useUserStore = create<UserState>((set, get) => ({
 
     try {
       const user = await userApi.getDefaultUser();
-      const cachedDefaultField = get().getCachedDefaultField(user.id);
-      set({ user, defaultField: cachedDefaultField, isLoading: false });
+      const cachedDefaultPlot = get().getCachedDefaultPlot(user.id);
+      set({ user, defaultPlot: cachedDefaultPlot, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -74,32 +74,32 @@ export const useUserStore = create<UserState>((set, get) => ({
     set({ user });
   },
 
-  getCachedDefaultField: (userId: string) => {
-    const cached = localStorage.getItem(defaultFieldCacheKey);
+  getCachedDefaultPlot: (userId: string) => {
+    const cached = localStorage.getItem(defaultPlotCacheKey);
     if (!cached) {
       return null;
     }
 
     try {
       const parsed: unknown = JSON.parse(cached);
-      if (!isCachedDefaultField(parsed) || parsed.userId !== userId) {
+      if (!isCachedDefaultPlot(parsed) || parsed.userId !== userId) {
         return null;
       }
 
-      return parsed.field;
+      return parsed.plot;
     } catch {
       return null;
     }
   },
 
-  cacheDefaultField: (userId: string, field: Field | null) => {
-    if (field === null) {
-      localStorage.removeItem(defaultFieldCacheKey);
-      set({ defaultField: null });
+  cacheDefaultPlot: (userId: string, plot: Plot | null) => {
+    if (plot === null) {
+      localStorage.removeItem(defaultPlotCacheKey);
+      set({ defaultPlot: null });
       return;
     }
 
-    localStorage.setItem(defaultFieldCacheKey, JSON.stringify({ userId, field }));
-    set({ defaultField: field });
+    localStorage.setItem(defaultPlotCacheKey, JSON.stringify({ userId, plot }));
+    set({ defaultPlot: plot });
   },
 }));

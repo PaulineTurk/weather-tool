@@ -6,12 +6,12 @@ export const userIdParamsSchema = z.object({
   userId: idParamSchema,
 });
 
-export const userIdFieldIdParamsSchema = z.object({
+export const userIdPlotIdParamsSchema = z.object({
   userId: idParamSchema,
-  fieldId: idParamSchema,
+  plotId: idParamSchema,
 });
 
-export const fieldPayloadSchema = z.object({
+export const plotPayloadSchema = z.object({
   name: z.string().trim().min(1),
   address: z
     .string()
@@ -35,7 +35,7 @@ export const fieldPayloadSchema = z.object({
     .transform((value) => (typeof value === 'undefined' ? null : value)),
 });
 
-export const defaultFieldPayloadSchema = z
+export const defaultPlotPayloadSchema = z
   .object({
     isDefault: z.boolean().optional(),
   })
@@ -48,6 +48,6 @@ export const userPreferencesPayloadSchema = z
   })
   .strict();
 
-export type FieldPayloadInput = z.infer<typeof fieldPayloadSchema>;
-export type DefaultFieldPayloadInput = z.infer<typeof defaultFieldPayloadSchema>;
+export type PlotPayloadInput = z.infer<typeof plotPayloadSchema>;
+export type DefaultPlotPayloadInput = z.infer<typeof defaultPlotPayloadSchema>;
 export type UserPreferencesPayloadInput = z.infer<typeof userPreferencesPayloadSchema>;

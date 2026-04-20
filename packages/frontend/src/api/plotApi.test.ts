@@ -1,12 +1,12 @@
-import { fieldApi, Field } from './fieldApi';
+import { plotApi, Plot } from './plotApi';
 
-describe('fieldApi', () => {
+describe('plotApi', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('gets user fields', async () => {
-    const fields: Field[] = [
+  it('gets user plots', async () => {
+    const plots: Plot[] = [
       {
         id: 'f1',
         name: 'Alpha',
@@ -20,34 +20,31 @@ describe('fieldApi', () => {
       },
     ];
 
-    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify(fields)));
+    vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify(plots)));
 
-    const result = await fieldApi.getFieldsForUser('user-1');
+    const result = await plotApi.getPlotsForUser('user-1');
 
-    expect(result).toEqual(fields);
-    expect(fetch).toHaveBeenCalledWith('/api/fields/users/user-1');
+    expect(result).toEqual(plots);
+    expect(fetch).toHaveBeenCalledWith('/api/plots/users/user-1');
   });
 
-  it('creates a field', async () => {
+  it('creates a plot', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([]), { status: 201 }));
 
-    await fieldApi.createField('user-1', {
+    await plotApi.createPlot('user-1', {
       name: 'Beta',
       latitude: 1,
       longitude: 2,
       address: 'Lyon',
     });
 
-    expect(fetch).toHaveBeenCalledWith(
-      '/api/fields/users/user-1',
-      expect.objectContaining({ method: 'POST' }),
-    );
+    expect(fetch).toHaveBeenCalledWith('/api/plots/users/user-1', expect.objectContaining({ method: 'POST' }));
   });
 
-  it('updates a field', async () => {
+  it('updates a plot', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([])));
 
-    await fieldApi.updateField('user-1', 'field-1', {
+    await plotApi.updatePlot('user-1', 'plot-1', {
       name: 'Edited',
       latitude: null,
       longitude: null,
@@ -55,29 +52,29 @@ describe('fieldApi', () => {
     });
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/fields/users/user-1/field-1',
+      '/api/plots/users/user-1/plot-1',
       expect.objectContaining({ method: 'PUT' }),
     );
   });
 
-  it('deletes a field', async () => {
+  it('deletes a plot', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([])));
 
-    await fieldApi.deleteField('user-1', 'field-1');
+    await plotApi.deletePlot('user-1', 'plot-1');
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/fields/users/user-1/field-1',
+      '/api/plots/users/user-1/plot-1',
       expect.objectContaining({ method: 'DELETE' }),
     );
   });
 
-  it('updates default field selection', async () => {
+  it('updates default plot selection', async () => {
     vi.spyOn(global, 'fetch').mockResolvedValue(new Response(JSON.stringify([])));
 
-    await fieldApi.setFieldDefault('user-1', 'field-1', true);
+    await plotApi.setPlotDefault('user-1', 'plot-1', true);
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/fields/users/user-1/field-1/default',
+      '/api/plots/users/user-1/plot-1/default',
       expect.objectContaining({ method: 'PATCH' }),
     );
   });

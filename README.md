@@ -1,6 +1,6 @@
-# Field Weather Dashboard
+# Plot Weather Dashboard
 
-Weather dashboard for field agents to monitor conditions across multiple plots.
+Weather dashboard for plot operators to monitor conditions across multiple plots.
 
 ## Requirements
 
@@ -45,7 +45,7 @@ Notes:
 ### 3) Generate Prisma client
 
 ```bash
-pnpm --filter @field-weather/database run generate
+pnpm --filter @plot-weather/database run generate
 ```
 
 ### 4) Run database migrations
@@ -70,7 +70,7 @@ Default URLs:
 For experienced users, here's a single command that runs all setup steps:
 
 ```bash
-pnpm install --config.confirmModulesPurge=false && echo "FROGCAST_API_TOKEN=your_token_here" > .env && pnpm --filter @field-weather/database run generate && pnpm db:migrate && pnpm dev
+pnpm install --config.confirmModulesPurge=false && echo "FROGCAST_API_TOKEN=your_token_here" > .env && pnpm --filter @plot-weather/database run generate && pnpm db:migrate && pnpm dev
 ```
 
 > **Note**: Replace `your_token_here` with your actual Frogcast API token, or edit the `.env` file after running.
@@ -204,7 +204,7 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 ### Open Questions
 
 - **Which weather API to integrate?** Need to identify the right provider for production use
-- **What does the API require?** Determine exact fields needed to fetch weather data (coordinates, field ID, etc.)
+- **What does the API require?** Determine exact data needed to fetch weather info (coordinates, plot ID, etc.)
 - **What weather info is actually useful to users?** Need to clarify which metrics are needed:
   - Temperature (current, min, max)
   - Precipitation (probability, accumulation)

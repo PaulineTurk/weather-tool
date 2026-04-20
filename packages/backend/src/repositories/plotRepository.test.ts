@@ -1,9 +1,9 @@
-import { fieldRepository, Field, FieldPayload } from './fieldRepository';
+import { plotRepository, Plot, PlotPayload } from './plotRepository';
 import prisma from '../db';
 
 jest.mock('../db', () => ({
   $transaction: jest.fn(),
-  field: {
+  plot: {
     findMany: jest.fn(),
     create: jest.fn(),
     findFirst: jest.fn(),
@@ -15,13 +15,13 @@ jest.mock('../db', () => ({
 
 const mockPrisma = jest.mocked(prisma);
 
-describe('fieldRepository', () => {
+describe('plotRepository', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('returns fields for a given user sorted by name', async () => {
-    const fields: Field[] = [
+  it('returns plots for a given user sorted by name', async () => {
+    const plots: Plot[] = [
       {
         id: 'f1',
         name: 'Alpha',
@@ -35,26 +35,26 @@ describe('fieldRepository', () => {
       },
     ];
 
-    mockPrisma.field.findMany.mockResolvedValue(fields);
+    mockPrisma.plot.findMany.mockResolvedValue(plots);
 
-    const result = await fieldRepository.getFieldsForUser('user-1');
+    const result = await plotRepository.getPlotsForUser('user-1');
 
-    expect(result).toEqual(fields);
-    expect(mockPrisma.field.findMany).toHaveBeenCalledWith({
+    expect(result).toEqual(plots);
+    expect(mockPrisma.plot.findMany).toHaveBeenCalledWith({
       where: { userId: 'user-1' },
       orderBy: { name: 'asc' },
     });
   });
 
-  it('creates a field for the given user', async () => {
-    const payload: FieldPayload = {
+  it('creates a plot for the given user', async () => {
+    const payload: PlotPayload = {
       name: 'Beta',
       latitude: null,
       longitude: null,
       address: null,
     };
 
-    const createdField: Field = {
+    const createdPlot: Plot = {
       id: 'f2',
       name: 'Beta',
       latitude: null,
@@ -66,12 +66,12 @@ describe('fieldRepository', () => {
       updatedAt: new Date('2024-01-01'),
     };
 
-    mockPrisma.field.create.mockResolvedValue(createdField);
+    mockPrisma.plot.create.mockResolvedValue(createdPlot);
 
-    const result = await fieldRepository.createFieldForUser('user-1', payload);
+    const result = await plotRepository.createPlotForUser('user-1', payload);
 
-    expect(result).toEqual(createdField);
-    expect(mockPrisma.field.create).toHaveBeenCalledWith({
+    expect(result).toEqual(createdPlot);
+    expect(mockPrisma.plot.create).toHaveBeenCalledWith({
       data: {
         userId: 'user-1',
         name: payload.name,
@@ -82,15 +82,15 @@ describe('fieldRepository', () => {
     });
   });
 
-  it('updates a field only when it belongs to user', async () => {
-    const payload: FieldPayload = {
+  it('updates a plot only when it belongs to user', async () => {
+    const payload: PlotPayload = {
       name: 'Gamma',
       latitude: 1,
       longitude: 2,
       address: 'Lyon',
     };
 
-    const existingField: Field = {
+    const existingPlot: Plot = {
       id: 'f3',
       name: 'Old',
       latitude: null,
@@ -102,24 +102,24 @@ describe('fieldRepository', () => {
       updatedAt: new Date('2024-01-01'),
     };
 
-    const updatedField: Field = {
-      ...existingField,
+    const updatedPlot: Plot = {
+      ...existingPlot,
       name: payload.name,
       latitude: payload.latitude,
       longitude: payload.longitude,
       address: payload.address,
     };
 
-    mockPrisma.field.findFirst.mockResolvedValue(existingField);
-    mockPrisma.field.update.mockResolvedValue(updatedField);
+    mockPrisma.plot.findFirst.mockResolvedValue(existingPlot);
+    mockPrisma.plot.update.mockResolvedValue(updatedPlot);
 
-    const result = await fieldRepository.updateFieldForUser('user-1', 'f3', payload);
+    const result = await plotRepository.updatePlotForUser('user-1', 'f3', payload);
 
-    expect(result).toEqual(updatedField);
-    expect(mockPrisma.field.findFirst).toHaveBeenCalledWith({
+    expect(result).toEqual(updatedPlot);
+    expect(mockPrisma.plot.findFirst).toHaveBeenCalledWith({
       where: { id: 'f3', userId: 'user-1' },
     });
-    expect(mockPrisma.field.update).toHaveBeenCalledWith({
+    expect(mockPrisma.plot.update).toHaveBeenCalledWith({
       where: { id: 'f3' },
       data: {
         name: payload.name,
@@ -130,35 +130,35 @@ describe('fieldRepository', () => {
     });
   });
 
-  it('returns null when updating unknown field', async () => {
-    const payload: FieldPayload = {
+  it('returns null when updating unknown plot', async () => {
+    const payload: PlotPayload = {
       name: 'Gamma',
       latitude: null,
       longitude: null,
       address: null,
     };
 
-    mockPrisma.field.findFirst.mockResolvedValue(null);
+    mockPrisma.plot.findFirst.mockResolvedValue(null);
 
-    const result = await fieldRepository.updateFieldForUser('user-1', 'missing', payload);
+    const result = await plotRepository.updatePlotForUser('user-1', 'missing', payload);
 
     expect(result).toBeNull();
-    expect(mockPrisma.field.update).not.toHaveBeenCalled();
+    expect(mockPrisma.plot.update).not.toHaveBeenCalled();
   });
 
-  it('deletes a field only for current user', async () => {
-    mockPrisma.field.deleteMany.mockResolvedValue({ count: 1 });
+  it('deletes a plot only for current user', async () => {
+    mockPrisma.plot.deleteMany.mockResolvedValue({ count: 1 });
 
-    const result = await fieldRepository.deleteFieldForUser('user-1', 'f4');
+    const result = await plotRepository.deletePlotForUser('user-1', 'f4');
 
     expect(result).toBe(true);
-    expect(mockPrisma.field.deleteMany).toHaveBeenCalledWith({
+    expect(mockPrisma.plot.deleteMany).toHaveBeenCalledWith({
       where: { id: 'f4', userId: 'user-1' },
     });
   });
 
-  it('sets the selected field as default and clears previous default', async () => {
-    const existingField: Field = {
+  it('sets the selected plot as default and clears previous default', async () => {
+    const existingPlot: Plot = {
       id: 'f1',
       name: 'Alpha',
       latitude: null,
@@ -170,39 +170,39 @@ describe('fieldRepository', () => {
       updatedAt: new Date('2024-01-01'),
     };
 
-    mockPrisma.field.findFirst.mockResolvedValue(existingField);
+    mockPrisma.plot.findFirst.mockResolvedValue(existingPlot);
     mockPrisma.$transaction.mockResolvedValue([]);
 
-    const result = await fieldRepository.setDefaultFieldForUser('user-1', 'f1');
+    const result = await plotRepository.setDefaultPlotForUser('user-1', 'f1');
 
     expect(result).toBe(true);
-    expect(mockPrisma.field.updateMany).toHaveBeenCalledWith({
+    expect(mockPrisma.plot.updateMany).toHaveBeenCalledWith({
       where: { userId: 'user-1', isDefault: true },
       data: { isDefault: false },
     });
-    expect(mockPrisma.field.update).toHaveBeenCalledWith({
+    expect(mockPrisma.plot.update).toHaveBeenCalledWith({
       where: { id: 'f1' },
       data: { isDefault: true },
     });
     expect(mockPrisma.$transaction).toHaveBeenCalled();
   });
 
-  it('returns false when setting default on unknown field', async () => {
-    mockPrisma.field.findFirst.mockResolvedValue(null);
+  it('returns false when setting default on unknown plot', async () => {
+    mockPrisma.plot.findFirst.mockResolvedValue(null);
 
-    const result = await fieldRepository.setDefaultFieldForUser('user-1', 'missing');
+    const result = await plotRepository.setDefaultPlotForUser('user-1', 'missing');
 
     expect(result).toBe(false);
     expect(mockPrisma.$transaction).not.toHaveBeenCalled();
   });
 
-  it('clears default status on a field', async () => {
-    mockPrisma.field.updateMany.mockResolvedValue({ count: 1 });
+  it('clears default status on a plot', async () => {
+    mockPrisma.plot.updateMany.mockResolvedValue({ count: 1 });
 
-    const result = await fieldRepository.clearDefaultFieldForUser('user-1', 'f1');
+    const result = await plotRepository.clearDefaultPlotForUser('user-1', 'f1');
 
     expect(result).toBe(true);
-    expect(mockPrisma.field.updateMany).toHaveBeenCalledWith({
+    expect(mockPrisma.plot.updateMany).toHaveBeenCalledWith({
       where: { id: 'f1', userId: 'user-1' },
       data: { isDefault: false },
     });

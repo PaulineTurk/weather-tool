@@ -5,7 +5,7 @@ import { vi } from 'vitest';
 import { AppLayout } from './App';
 import { useUserStore } from './store/userStore';
 import { userApi } from './api/userApi';
-import { fieldApi } from './api/fieldApi';
+import { plotApi } from './api/plotApi';
 
 describe('App premium access route', () => {
   const testUser = {
@@ -23,7 +23,7 @@ describe('App premium access route', () => {
     useUserStore.setState({ user: testUser, isLoading: false, error: null });
     vi.clearAllMocks();
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue(testUser);
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([]);
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([]);
   });
 
   it('hides the header on /premium-access', () => {
@@ -45,7 +45,7 @@ describe('App premium access route', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText(/your fields/i)).toBeVisible();
+    expect(await screen.findByText(/your plots/i)).toBeVisible();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /premium access/i }));

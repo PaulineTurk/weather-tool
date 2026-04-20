@@ -4,14 +4,14 @@ import { vi } from 'vitest';
 import { HomePage } from './HomePage';
 import { useUserStore } from '../store/userStore';
 import { userApi } from '../api/userApi';
-import { fieldApi } from '../api/fieldApi';
+import { plotApi } from '../api/plotApi';
 
 describe('HomePage', () => {
   beforeEach(() => {
     localStorage.clear();
     useUserStore.setState(useUserStore.getInitialState());
     vi.clearAllMocks();
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([]);
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([]);
   });
 
   it('should display "No user found" when user is null', () => {
@@ -55,7 +55,7 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(await screen.findByText(/your fields/i)).toBeVisible();
+    expect(await screen.findByText(/your plots/i)).toBeVisible();
   });
 
   it('should show greeting after retry succeeds', async () => {
@@ -74,10 +74,10 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     user.click(retryButton);
 
-    expect(await screen.findByText(/your fields/i)).toBeInTheDocument();
+    expect(await screen.findByText(/your plots/i)).toBeInTheDocument();
   });
 
-  it('creates a field from the modal form', async () => {
+  it('creates a plot from the modal form', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
@@ -87,7 +87,7 @@ describe('HomePage', () => {
       updatedAt: '2024-01-01',
     });
 
-    vi.spyOn(fieldApi, 'createField').mockResolvedValue([
+    vi.spyOn(plotApi, 'createPlot').mockResolvedValue([
       {
         id: 'f1',
         name: 'Beta',
@@ -104,15 +104,15 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: /add field/i }));
+    await user.click(await screen.findByRole('button', { name: /add plot/i }));
     await user.type(screen.getByRole('textbox', { name: /name/i }), 'Beta');
     await user.type(screen.getByRole('textbox', { name: /address/i }), 'Annecy');
-    await user.click(screen.getByRole('button', { name: /create field/i }));
+    await user.click(screen.getByRole('button', { name: /create plot/i }));
 
     expect(await screen.findByText('Beta')).toBeVisible();
   });
 
-  it('edits then deletes a field from the list', async () => {
+  it('edits then deletes a plot from the list', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
@@ -122,7 +122,7 @@ describe('HomePage', () => {
       updatedAt: '2024-01-01',
     });
 
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha',
@@ -136,7 +136,7 @@ describe('HomePage', () => {
       },
     ]);
 
-    vi.spyOn(fieldApi, 'updateField').mockResolvedValue([
+    vi.spyOn(plotApi, 'updatePlot').mockResolvedValue([
       {
         id: 'f1',
         name: 'Zulu',
@@ -150,7 +150,7 @@ describe('HomePage', () => {
       },
     ]);
 
-    vi.spyOn(fieldApi, 'deleteField').mockResolvedValue([]);
+    vi.spyOn(plotApi, 'deletePlot').mockResolvedValue([]);
 
     render(<HomePage />);
 
@@ -164,10 +164,10 @@ describe('HomePage', () => {
     expect(await screen.findByText('Zulu')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: /delete/i }));
-    expect(await screen.findByText(/no fields yet/i)).toBeVisible();
+    expect(await screen.findByText(/no plots yet/i)).toBeVisible();
   });
 
-  it('moves selected default field to dedicated top section', async () => {
+  it('moves selected default plot to dedicated top section', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
@@ -177,7 +177,7 @@ describe('HomePage', () => {
       updatedAt: '2024-01-01',
     });
 
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha',
@@ -202,7 +202,7 @@ describe('HomePage', () => {
       },
     ]);
 
-    vi.spyOn(fieldApi, 'setFieldDefault').mockResolvedValue([
+    vi.spyOn(plotApi, 'setPlotDefault').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha',
@@ -230,15 +230,15 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: /set alpha as default field/i }));
+    await user.click(await screen.findByRole('button', { name: /set alpha as default plot/i }));
 
-    expect(await screen.findByText('Default field')).toBeVisible();
-    expect(screen.getByRole('button', { name: /remove alpha as default field/i })).toBeVisible();
-    expect(fieldApi.setFieldDefault).toHaveBeenCalledWith('1', 'f1', true);
-    expect(screen.getByRole('heading', { name: /your fields \(2\/2\)/i })).toBeVisible();
+    expect(await screen.findByText('Default plot')).toBeVisible();
+    expect(screen.getByRole('button', { name: /remove alpha as default plot/i })).toBeVisible();
+    expect(plotApi.setPlotDefault).toHaveBeenCalledWith('1', 'f1', true);
+    expect(screen.getByRole('heading', { name: /your plots \(2\/2\)/i })).toBeVisible();
   });
 
-  it('filters fields by name from the search bar', async () => {
+  it('filters plots by name from the search bar', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
@@ -248,7 +248,7 @@ describe('HomePage', () => {
       updatedAt: '2024-01-01',
     });
 
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha',
@@ -279,13 +279,13 @@ describe('HomePage', () => {
     expect(screen.getByText('Beta')).toBeVisible();
 
     const user = userEvent.setup();
-    await user.type(screen.getByRole('searchbox', { name: /search fields by name/i }), 'be');
+    await user.type(screen.getByRole('searchbox', { name: /search plots by name/i }), 'be');
 
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeVisible();
   });
 
-  it('allows editing and deleting the default field', async () => {
+  it('allows editing and deleting the default plot', async () => {
     vi.spyOn(userApi, 'getDefaultUser').mockResolvedValue({
       id: '1',
       name: 'Test User',
@@ -295,7 +295,7 @@ describe('HomePage', () => {
       updatedAt: '2024-01-01',
     });
 
-    vi.spyOn(fieldApi, 'getFieldsForUser').mockResolvedValue([
+    vi.spyOn(plotApi, 'getPlotsForUser').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha',
@@ -309,7 +309,7 @@ describe('HomePage', () => {
       },
     ]);
 
-    vi.spyOn(fieldApi, 'updateField').mockResolvedValue([
+    vi.spyOn(plotApi, 'updatePlot').mockResolvedValue([
       {
         id: 'f1',
         name: 'Alpha Prime',
@@ -323,7 +323,7 @@ describe('HomePage', () => {
       },
     ]);
 
-    vi.spyOn(fieldApi, 'deleteField').mockResolvedValue([]);
+    vi.spyOn(plotApi, 'deletePlot').mockResolvedValue([]);
 
     render(<HomePage />);
 
@@ -337,6 +337,6 @@ describe('HomePage', () => {
     expect(await screen.findByText('Alpha Prime')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: /^delete$/i }));
-    expect(await screen.findByText(/no fields yet/i)).toBeVisible();
+    expect(await screen.findByText(/no plots yet/i)).toBeVisible();
   });
 });

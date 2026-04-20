@@ -1,6 +1,6 @@
 import prisma from '../db';
 
-export type Field = {
+export type Plot = {
   id: string;
   name: string;
   latitude: number | null;
@@ -12,23 +12,23 @@ export type Field = {
   updatedAt: Date;
 };
 
-export type FieldPayload = {
+export type PlotPayload = {
   name: string;
   latitude: number | null;
   longitude: number | null;
   address: string | null;
 };
 
-export const fieldRepository = {
-  async getFieldsForUser(userId: string): Promise<Field[]> {
-    return prisma.field.findMany({
+export const plotRepository = {
+  async getPlotsForUser(userId: string): Promise<Plot[]> {
+    return prisma.plot.findMany({
       where: { userId },
       orderBy: { name: 'asc' },
     });
   },
 
-  async createFieldForUser(userId: string, payload: FieldPayload): Promise<Field> {
-    return prisma.field.create({
+  async createPlotForUser(userId: string, payload: PlotPayload): Promise<Plot> {
+    return prisma.plot.create({
       data: {
         userId,
         name: payload.name,
@@ -39,20 +39,20 @@ export const fieldRepository = {
     });
   },
 
-  async updateFieldForUser(userId: string, fieldId: string, payload: FieldPayload): Promise<Field | null> {
-    const field = await prisma.field.findFirst({
+  async updatePlotForUser(userId: string, plotId: string, payload: PlotPayload): Promise<Plot | null> {
+    const plot = await prisma.plot.findFirst({
       where: {
-        id: fieldId,
+        id: plotId,
         userId,
       },
     });
 
-    if (!field) {
+    if (!plot) {
       return null;
     }
 
-    return prisma.field.update({
-      where: { id: fieldId },
+    return prisma.plot.update({
+      where: { id: plotId },
       data: {
         name: payload.name,
         latitude: payload.latitude,
@@ -62,10 +62,10 @@ export const fieldRepository = {
     });
   },
 
-  async deleteFieldForUser(userId: string, fieldId: string): Promise<boolean> {
-    const result = await prisma.field.deleteMany({
+  async deletePlotForUser(userId: string, plotId: string): Promise<boolean> {
+    const result = await prisma.plot.deleteMany({
       where: {
-        id: fieldId,
+        id: plotId,
         userId,
       },
     });
@@ -73,20 +73,20 @@ export const fieldRepository = {
     return result.count === 1;
   },
 
-  async setDefaultFieldForUser(userId: string, fieldId: string): Promise<boolean> {
-    const field = await prisma.field.findFirst({
+  async setDefaultPlotForUser(userId: string, plotId: string): Promise<boolean> {
+    const plot = await prisma.plot.findFirst({
       where: {
-        id: fieldId,
+        id: plotId,
         userId,
       },
     });
 
-    if (!field) {
+    if (!plot) {
       return false;
     }
 
     await prisma.$transaction([
-      prisma.field.updateMany({
+      prisma.plot.updateMany({
         where: {
           userId,
           isDefault: true,
@@ -95,9 +95,9 @@ export const fieldRepository = {
           isDefault: false,
         },
       }),
-      prisma.field.update({
+      prisma.plot.update({
         where: {
-          id: fieldId,
+          id: plotId,
         },
         data: {
           isDefault: true,
@@ -108,10 +108,10 @@ export const fieldRepository = {
     return true;
   },
 
-  async clearDefaultFieldForUser(userId: string, fieldId: string): Promise<boolean> {
-    const result = await prisma.field.updateMany({
+  async clearDefaultPlotForUser(userId: string, plotId: string): Promise<boolean> {
+    const result = await prisma.plot.updateMany({
       where: {
-        id: fieldId,
+        id: plotId,
         userId,
       },
       data: {

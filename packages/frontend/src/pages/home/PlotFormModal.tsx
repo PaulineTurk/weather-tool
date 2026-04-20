@@ -1,5 +1,5 @@
 import { FormEvent } from 'react';
-import type { Field, FieldPayload } from '../../api/fieldApi';
+import type { Plot, PlotPayload } from '../../api/plotApi';
 
 const parseOptionalNumber = (value: FormDataEntryValue | null): number | null => {
   if (typeof value !== 'string' || value.trim().length === 0) {
@@ -12,19 +12,19 @@ const parseOptionalNumber = (value: FormDataEntryValue | null): number | null =>
 
 type Props = {
   isOpen: boolean;
-  editingField: Field | null;
+  editingPlot: Plot | null;
   isSubmitting: boolean;
   error: string | null;
   onClose: () => void;
-  onSubmit: (payload: FieldPayload) => Promise<void>;
+  onSubmit: (payload: PlotPayload) => Promise<void>;
 };
 
-export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onClose, onSubmit }: Props) {
+export function PlotFormModal({ isOpen, editingPlot, isSubmitting, error, onClose, onSubmit }: Props) {
   if (!isOpen) {
     return null;
   }
 
-  const isEditing = editingField !== null;
+  const isEditing = editingPlot !== null;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,7 +37,7 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
       return;
     }
 
-    const payload: FieldPayload = {
+    const payload: PlotPayload = {
       name: rawName.trim(),
       address: typeof rawAddress === 'string' && rawAddress.trim().length > 0 ? rawAddress.trim() : null,
       latitude: parseOptionalNumber(formData.get('latitude')),
@@ -50,17 +50,17 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
   return (
     <section
       className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 px-4"
-      aria-label="field form modal"
+      aria-label="plot form modal"
     >
       <form className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg space-y-4" onSubmit={handleSubmit}>
-        <h3 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit field' : 'Create field'}</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit plot' : 'Create plot'}</h3>
 
         <label className="block text-sm font-medium text-gray-700">
           Name *
           <input
             name="name"
             type="text"
-            defaultValue={editingField?.name ?? ''}
+            defaultValue={editingPlot?.name ?? ''}
             className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
             required
           />
@@ -71,7 +71,7 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
           <input
             name="address"
             type="text"
-            defaultValue={editingField?.address ?? ''}
+            defaultValue={editingPlot?.address ?? ''}
             className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
           />
         </label>
@@ -87,8 +87,8 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
               max={90}
               inputMode="decimal"
               defaultValue={
-                editingField?.latitude !== null && editingField?.latitude !== undefined
-                  ? String(editingField.latitude)
+                editingPlot?.latitude !== null && editingPlot?.latitude !== undefined
+                  ? String(editingPlot.latitude)
                   : ''
               }
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
@@ -105,8 +105,8 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
               max={180}
               inputMode="decimal"
               defaultValue={
-                editingField?.longitude !== null && editingField?.longitude !== undefined
-                  ? String(editingField.longitude)
+                editingPlot?.longitude !== null && editingPlot?.longitude !== undefined
+                  ? String(editingPlot.longitude)
                   : ''
               }
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
@@ -130,7 +130,7 @@ export function FieldFormModal({ isOpen, editingField, isSubmitting, error, onCl
             className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-60"
             disabled={isSubmitting}
           >
-            {isEditing ? 'Save changes' : 'Create field'}
+            {isEditing ? 'Save changes' : 'Create plot'}
           </button>
         </div>
       </form>

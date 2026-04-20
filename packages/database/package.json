@@ -1,5 +1,5 @@
 {
-  "name": "@field-weather/database",
+  "name": "@plot-weather/database",
   "version": "1.0.0",
   "private": true,
   "prisma": {
