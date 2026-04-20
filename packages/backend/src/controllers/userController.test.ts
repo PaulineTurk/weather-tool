@@ -100,5 +100,18 @@ describe('userController', () => {
 
       expect(mockResponse.json).toHaveBeenCalledWith(updatedUser);
     });
+
+    it('rejects invalid preferences payload', async () => {
+      mockRequest = {
+        params: { userId: 'default-user' },
+        body: { temperatureUnit: 'K', forecastDays: 7 },
+      };
+
+      await userController.updateUserPreferences(mockRequest as Request, mockResponse as Response);
+
+      expect(mockUserRepository.updateUserPreferences).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Invalid preferences payload' });
+    });
   });
 });

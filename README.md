@@ -65,12 +65,6 @@ Default URLs:
 - Backend calls Frogcast using `FROGCAST_API_TOKEN`.
 - There is no separate local weather server; weather is served by backend routes.
 
-Useful route for direct weather checks:
-
-```bash
-GET /api/fields/weather?latitude=48.1222&longitude=2.0344
-```
-
 
 ## Tech Stack
 

@@ -214,4 +214,24 @@ describe('fieldController', () => {
     ]);
     expect(mockFieldRepository.setDefaultFieldForUser).toHaveBeenCalledWith('user-1', 'f2');
   });
+
+  it('defaults to setting default field when body is empty', async () => {
+    const app = createApp();
+    mockFieldRepository.setDefaultFieldForUser.mockResolvedValue(true);
+    mockFieldRepository.getFieldsForUser.mockResolvedValue([]);
+
+    await request(app).patch('/fields/user-1/f2/default').send({}).expect(200);
+
+    expect(mockFieldRepository.setDefaultFieldForUser).toHaveBeenCalledWith('user-1', 'f2');
+    expect(mockFieldRepository.clearDefaultFieldForUser).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid default payload', async () => {
+    const app = createApp();
+    const response = await request(app).patch('/fields/user-1/f2/default').send({ isDefault: 'yes' }).expect(400);
+
+    expect(response.body).toEqual({ error: 'Invalid default payload' });
+    expect(mockFieldRepository.setDefaultFieldForUser).not.toHaveBeenCalled();
+    expect(mockFieldRepository.clearDefaultFieldForUser).not.toHaveBeenCalled();
+  });
 });

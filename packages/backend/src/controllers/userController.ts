@@ -1,28 +1,6 @@
 import { Request, Response } from 'express';
 import { userRepository } from '../repositories/userRepository';
-
-const isObject = (value: unknown): value is object => typeof value === 'object' && value !== null;
-
-const readProperty = (source: object, key: string): unknown => Reflect.get(source, key);
-
-const normalizePreferencesPayload = (body: unknown): { temperatureUnit: 'C' | 'F'; forecastDays: number } | null => {
-  if (!isObject(body)) {
-    return null;
-  }
-
-  const temperatureUnit = readProperty(body, 'temperatureUnit');
-  const forecastDays = readProperty(body, 'forecastDays');
-
-  if ((temperatureUnit !== 'C' && temperatureUnit !== 'F') || typeof forecastDays !== 'number') {
-    return null;
-  }
-
-  if (!Number.isInteger(forecastDays) || forecastDays < 1 || forecastDays > 10) {
-    return null;
-  }
-
-  return { temperatureUnit, forecastDays };
-};
+import { userIdParamsSchema, userPreferencesPayloadSchema } from '../validation/schemas';
 
 export const userController = {
   async getDefaultUser(_req: Request, res: Response): Promise<void> {
@@ -42,14 +20,20 @@ export const userController = {
 
   async updateUserPreferences(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
-      const preferences = normalizePreferencesPayload(req.body);
+      const params = userIdParamsSchema.safeParse(req.params);
+      if (!params.success) {
+        res.status(400).json({ error: 'Invalid userId param' });
+        return;
+      }
 
-      if (!preferences) {
+      const parsed = userPreferencesPayloadSchema.safeParse(req.body);
+      if (!parsed.success) {
         res.status(400).json({ error: 'Invalid preferences payload' });
         return;
       }
 
+      const userId = params.data.userId;
+      const preferences = parsed.data;
       const updatedUser = await userRepository.updateUserPreferences(userId, preferences);
 
       if (!updatedUser) {
