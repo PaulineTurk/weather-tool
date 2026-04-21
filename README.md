@@ -65,15 +65,6 @@ Default URLs:
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:4000`
 
-### One-liner (All Steps)
-
-For experienced users, here's a single command that runs all setup steps:
-
-```bash
-pnpm install --config.confirmModulesPurge=false && echo "FROGCAST_API_TOKEN=your_token_here" > .env && pnpm --filter @plot-weather/database run generate && pnpm db:migrate && pnpm dev
-```
-
-> **Note**: Replace `your_token_here` with your actual Frogcast API token, or edit the `.env` file after running.
 
 ## Tech Stack
 
