@@ -14,11 +14,11 @@ const resolveCoordinates = async (
   plot: Plot,
   geocoder: Geocoder,
 ): Promise<Coordinates | null> => {
-  if (plot.address) {
-    return await geocoder.geocode(plot.address);
-  }
   if (plot.latitude !== null && plot.longitude !== null) {
     return { latitude: plot.latitude, longitude: plot.longitude };
+  }
+  if (plot.address) {
+    return await geocoder.geocode(plot.address);
   }
   return null;
 };
