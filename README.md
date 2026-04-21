@@ -144,6 +144,7 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 
 ### Data
 
+- Weather data is averaged per day only (no hourly breakdown)
 - No weather response caching (API called on every request)
 - Frogcast rate limiting can be reached quickly
 - No offline mode
@@ -154,6 +155,8 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 - No interactive map for plot visualization
 - No heatmap for overview
 - Plot order not customizable (alphabetical only)
+- No address autocomplete when creating a plot (address must be entered manually and exactly)
+- Address recognition is strict — slight typos or formatting differences can cause geocoding failures
 
 ### Infrastructure
 
@@ -175,6 +178,7 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 
 ### Weather
 
+- Hourly weather data per plot, this would require a significant UX redesign, e.g. a dedicated page per plot to accommodate the much larger volume of data to display
 - Integration of a paid weather API or with higher quotas
 - Response caching (1h)
 - WebSockets for real-time updates
@@ -185,6 +189,7 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 - Interactive map for plot visualization
 - Heatmap for overview of conditions
 - Offline mode
+- Address autocomplete when creating a plot, with more lenient geocoding to handle typos and formatting variations
 - Manual plot reordering with persistence
 - Advanced search bar with multiple filters
 
