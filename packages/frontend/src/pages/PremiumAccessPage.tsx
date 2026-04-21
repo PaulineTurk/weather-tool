@@ -10,7 +10,9 @@ export function PremiumAccessPage() {
         <div className="grid gap-0 lg:grid-cols-2">
           <div className="p-6 sm:p-8 lg:p-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-green-700">Premium access</p>
-            <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">Under construction — it&apos;s growing!</h1>
+            <h1 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
+              Under construction — it&apos;s growing!
+            </h1>
             <p className="mt-3 text-gray-600">
               We&apos;re building something new. Meanwhile, you can keep using the app as usual.
             </p>
@@ -30,7 +32,12 @@ export function PremiumAccessPage() {
             <div className={styles.scene} aria-hidden="true">
               <div className={styles.plotLines} />
               <div className={styles.tractorWrap}>
-                <svg className={styles.tractorSvg} viewBox="0 0 420 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  className={styles.tractorSvg}
+                  viewBox="0 0 420 160"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   {/* ground */}
                   <path d="M10 125H410" stroke="currentColor" strokeWidth="2" opacity="0.25" />
 
@@ -54,18 +61,8 @@ export function PremiumAccessPage() {
                   <path d="M268 46V64" stroke="currentColor" strokeWidth="2" opacity="0.7" />
 
                   {/* plow */}
-                  <path
-                    d="M340 94L380 118"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M378 117L402 112"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
+                  <path d="M340 94L380 118" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M378 117L402 112" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
 
                   {/* wheels */}
                   <g className={styles.wheelBig}>
@@ -91,4 +88,3 @@ export function PremiumAccessPage() {
     </main>
   );
 }
-

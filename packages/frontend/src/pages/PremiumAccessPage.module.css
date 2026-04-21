@@ -11,14 +11,13 @@
   position: absolute;
   inset: auto -20% 0 -20%;
   height: 55%;
-  background:
-    repeating-linear-gradient(
-      115deg,
-      rgba(15, 23, 42, 0.08) 0px,
-      rgba(15, 23, 42, 0.08) 2px,
-      transparent 2px,
-      transparent 18px
-    );
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(15, 23, 42, 0.08) 0px,
+    rgba(15, 23, 42, 0.08) 2px,
+    transparent 2px,
+    transparent 18px
+  );
   transform: skewY(-6deg);
   animation: plotScroll 2.6s linear infinite;
 }
@@ -81,4 +80,3 @@
     bottom: 20%;
   }
 }
-

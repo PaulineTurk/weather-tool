@@ -204,7 +204,10 @@ describe('plotController', () => {
     mockPlotRepository.setDefaultPlotForUser.mockResolvedValue(true);
     mockPlotRepository.getPlotsForUser.mockResolvedValue(refreshedPlots);
 
-    const response = await request(app).patch('/plots/user-1/f2/default').send({ isDefault: true }).expect(200);
+    const response = await request(app)
+      .patch('/plots/user-1/f2/default')
+      .send({ isDefault: true })
+      .expect(200);
 
     expect(response.body).toEqual([
       expect.objectContaining({
@@ -228,7 +231,10 @@ describe('plotController', () => {
 
   it('rejects invalid default payload', async () => {
     const app = createApp();
-    const response = await request(app).patch('/plots/user-1/f2/default').send({ isDefault: 'yes' }).expect(400);
+    const response = await request(app)
+      .patch('/plots/user-1/f2/default')
+      .send({ isDefault: 'yes' })
+      .expect(400);
 
     expect(response.body).toEqual({ error: 'Invalid default payload' });
     expect(mockPlotRepository.setDefaultPlotForUser).not.toHaveBeenCalled();

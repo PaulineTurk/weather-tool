@@ -55,4 +55,3 @@ describe('App premium access route', () => {
     expect(screen.queryByRole('button', { name: /premium access/i })).not.toBeInTheDocument();
   });
 });
-

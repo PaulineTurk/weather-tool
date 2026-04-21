@@ -75,7 +75,6 @@ pnpm install --config.confirmModulesPurge=false && echo "FROGCAST_API_TOKEN=your
 
 > **Note**: Replace `your_token_here` with your actual Frogcast API token, or edit the `.env` file after running.
 
-
 ## Tech Stack
 
 - **Frontend**: React 18, Vite, Zustand, TailwindCSS
@@ -92,38 +91,38 @@ The project is organized as a monorepo to keep frontend, backend, and database i
 
 ### Frontend
 
-| Choice | Rationale |
-| --- | --- |
-| **React 18** | Industry standard, rich ecosystem, reusable components |
-| **Vite** | Modern build tool, instant HMR, minimal configuration |
-| **Zustand** | Lightweight state management, simple API, no Redux boilerplate, built-in localStorage persistence |
-| **TailwindCSS** | Utility-first, fast responsive design, optimized bundle |
-| **React Router** | Simple and proven client-side navigation |
+| Choice           | Rationale                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| **React 18**     | Industry standard, rich ecosystem, reusable components                                            |
+| **Vite**         | Modern build tool, instant HMR, minimal configuration                                             |
+| **Zustand**      | Lightweight state management, simple API, no Redux boilerplate, built-in localStorage persistence |
+| **TailwindCSS**  | Utility-first, fast responsive design, optimized bundle                                           |
+| **React Router** | Simple and proven client-side navigation                                                          |
 
 ### Backend
 
-| Choice | Rationale |
-| --- | --- |
-| **Express** | Minimalist, mature, large middleware ecosystem |
-| **TypeScript** | Static typing for safety and autocompletion |
-| **Zod** | Runtime schema validation for incoming data |
+| Choice         | Rationale                                      |
+| -------------- | ---------------------------------------------- |
+| **Express**    | Minimalist, mature, large middleware ecosystem |
+| **TypeScript** | Static typing for safety and autocompletion    |
+| **Zod**        | Runtime schema validation for incoming data    |
 
 ### Database
 
-| Choice | Rationale |
-| --- | --- |
-| **Prisma** | Typed ORM, built-in migrations, ergonomic CLI, beginner-friendly |
+| Choice     | Rationale                                                             |
+| ---------- | --------------------------------------------------------------------- |
+| **Prisma** | Typed ORM, built-in migrations, ergonomic CLI, beginner-friendly      |
 | **SQLite** | Single-file database, zero configuration, ideal for local development |
 
 ### Why Prisma over Drizzle or raw SQL?
 
-| Criteria | raw SQL | Drizzle | Prisma |
-| --- | --- | --- | --- |
-| Easy setup | ✅ | ✅ | ✅✅✅ |
-| Typing | ❌ | ✅✅ | ✅✅✅ |
-| Beginner-friendly | ✅ | ✅ | ✅✅✅ |
-| Built-in migrations | ❌ | ✅ | ✅✅✅ |
-| Bundle optimized | ✅✅ | ✅ | ❌ |
+| Criteria            | raw SQL | Drizzle | Prisma |
+| ------------------- | ------- | ------- | ------ |
+| Easy setup          | ✅      | ✅      | ✅✅✅ |
+| Typing              | ❌      | ✅✅    | ✅✅✅ |
+| Beginner-friendly   | ✅      | ✅      | ✅✅✅ |
+| Built-in migrations | ❌      | ✅      | ✅✅✅ |
+| Bundle optimized    | ✅✅    | ✅      | ❌     |
 
 Prisma was chosen for its gentle learning curve and integrated migration tools, despite a less optimized bundle.
 

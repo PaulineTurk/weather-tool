@@ -114,8 +114,7 @@ export function HomePage() {
                       <p className="text-gray-600">{filteredDefaultPlot.address}</p>
                     ) : null}
                     <p className="text-sm text-gray-500">
-                      Lat: {filteredDefaultPlot.latitude ?? '-'} | Lng:{' '}
-                      {filteredDefaultPlot.longitude ?? '-'}
+                      Lat: {filteredDefaultPlot.latitude ?? '-'} | Lng: {filteredDefaultPlot.longitude ?? '-'}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">

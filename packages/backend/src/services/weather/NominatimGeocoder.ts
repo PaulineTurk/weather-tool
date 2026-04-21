@@ -1,9 +1,8 @@
 import type { Coordinates, Geocoder } from './types';
-import { nominatimResponseSchema } from "../../validation/schemas"
+import { nominatimResponseSchema } from '../../validation/schemas';
 
 const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search';
 const USER_AGENT = 'weather-tool/1.0';
-
 
 export class NominatimGeocoder implements Geocoder {
   async geocode(address: string): Promise<Coordinates | null> {

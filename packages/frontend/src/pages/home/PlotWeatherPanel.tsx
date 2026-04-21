@@ -14,10 +14,7 @@ export function PlotWeatherPanel({ weather, unit, dayCardClassName, emptyClassNa
       <div className="overflow-x-auto">
         <div className="flex gap-2">
           {weather.days.map((dayWeather) => (
-            <article
-              key={dayWeather.date}
-              className={`${dayCardClassName} whitespace-nowrap w-fit shrink-0`}
-            >
+            <article key={dayWeather.date} className={`${dayCardClassName} whitespace-nowrap w-fit shrink-0`}>
               <p className="text-xs font-semibold text-gray-700">{dayWeather.date}</p>
               <p className="text-xs text-gray-600">
                 Temp: {displayTemperature(dayWeather.temperatureC, unit)}
@@ -46,5 +43,7 @@ export function PlotWeatherPanel({ weather, unit, dayCardClassName, emptyClassNa
     );
   }
 
-  return <p className={emptyClassName}>{weather?.message ?? 'Weather forecast unavailable for this plot.'}</p>;
+  return (
+    <p className={emptyClassName}>{weather?.message ?? 'Weather forecast unavailable for this plot.'}</p>
+  );
 }

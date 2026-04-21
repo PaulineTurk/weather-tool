@@ -38,7 +38,10 @@ describe('plotApi', () => {
       address: 'Lyon',
     });
 
-    expect(fetch).toHaveBeenCalledWith('/api/plots/users/user-1', expect.objectContaining({ method: 'POST' }));
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/plots/users/user-1',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 
   it('updates a plot', async () => {

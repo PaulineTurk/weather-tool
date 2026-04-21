@@ -41,7 +41,7 @@ importers:
 
   packages/backend:
     dependencies:
-      '@field-weather/database':
+      '@plot-weather/database':
         specifier: workspace:*
         version: link:../database
       '@prisma/client':
