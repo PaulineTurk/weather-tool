@@ -1,8 +1,11 @@
 export type WeatherDay = {
   date: string;
   temperatureC: number | null;
+  temperatureMin: number | null;
+  temperatureMax: number | null;
   precipitationMm: number | null;
   windSpeedMs: number | null;
+  windGustMs: number | null;
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
 };
 

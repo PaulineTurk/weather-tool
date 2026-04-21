@@ -8,8 +8,11 @@ type Coordinates = {
 export type WeatherDay = {
   date: string;
   temperatureC: number | null;
+  temperatureMin: number | null;
+  temperatureMax: number | null;
   precipitationMm: number | null;
   windSpeedMs: number | null;
+  windGustMs: number | null;
   confidenceLevel: 'high' | 'medium' | 'low' | 'unknown';
 };
 
@@ -84,6 +87,22 @@ const confidenceFromSpread = (spread: number | null): 'high' | 'medium' | 'low' 
   return 'low';
 };
 
+const min = (values: Array<number | null>): number | null => {
+  const filteredValues = values.filter((value): value is number => value !== null);
+  if (filteredValues.length === 0) {
+    return null;
+  }
+  return Math.min(...filteredValues);
+};
+
+const max = (values: Array<number | null>): number | null => {
+  const filteredValues = values.filter((value): value is number => value !== null);
+  if (filteredValues.length === 0) {
+    return null;
+  }
+  return Math.max(...filteredValues);
+};
+
 const buildDailyWeather = (raw: {
   index: string[];
   t2m: Array<number | null>;
@@ -120,16 +139,16 @@ const buildDailyWeather = (raw: {
   return Array.from(grouped.entries())
     .sort(([firstDate], [secondDate]) => firstDate.localeCompare(secondDate))
     .slice(0, maxDays)
-    .map(([date, values]) => {
-      const spreadAverage = average(values.spread);
-      return {
-        date,
-        temperatureC: toRounded(average(values.temp)),
-        precipitationMm: toRounded(sum(values.rain)),
-        windSpeedMs: toRounded(average(values.wind)),
-        confidenceLevel: confidenceFromSpread(spreadAverage),
-      };
-    });
+    .map(([date, values]) => ({
+      date,
+      temperatureC: toRounded(average(values.temp)),
+      temperatureMin: toRounded(min(values.temp)),
+      temperatureMax: toRounded(max(values.temp)),
+      precipitationMm: toRounded(sum(values.rain)),
+      windSpeedMs: toRounded(average(values.wind)),
+      windGustMs: toRounded(max(values.wind)),
+      confidenceLevel: confidenceFromSpread(average(values.spread)),
+    }));
 };
 
 const geocodeAddress = async (address: string): Promise<Coordinates | null> => {
