@@ -48,6 +48,25 @@ export const userPreferencesPayloadSchema = z
   })
   .strict();
 
+export const frogcastResponseSchema = z.object({
+  index: z.array(z.string()),
+  columns: z.array(z.string()),
+  data: z.array(z.array(z.unknown())),
+});
+
+const coordinateStringSchema = z.string()
+  .transform(Number.parseFloat)
+  .pipe(z.number());
+
+export const nominatimResponseSchema = z.array(
+  z.object({
+    lat: coordinateStringSchema,
+    lon: coordinateStringSchema,
+  })
+).min(1);
+
 export type PlotPayloadInput = z.infer<typeof plotPayloadSchema>;
 export type DefaultPlotPayloadInput = z.infer<typeof defaultPlotPayloadSchema>;
 export type UserPreferencesPayloadInput = z.infer<typeof userPreferencesPayloadSchema>;
+export type FrogcastResponseSchema = z.infer<typeof frogcastResponseSchema>;
+export type NominatimResponseSchema = z.infer<typeof nominatimResponseSchema>;
