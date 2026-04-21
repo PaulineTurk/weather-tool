@@ -162,6 +162,7 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 - SQLite for local use only (not suitable for multi-user production)
 - No WebSockets for real-time updates
 - No secrets management (`.env` in plain text)
+- No test coverage check
 
 ---
 
@@ -198,11 +199,13 @@ Prisma was chosen for its gentle learning curve and integrated migration tools, 
 - Secrets management (Vault, AWS Secrets Manager, etc.)
 - Dockerization for deployment
 - CI/CD pipeline
+- Add test coverage tool
 
 ### Code Quality
 
 - Shared types between frontend and backend
 - Better error handling and logging
+- Improve test coverage
 - End-to-end integration tests
 
 ### Open Questions
